@@ -12,7 +12,7 @@ namespace Wikiled.Arff.Persistence
 
         IHeader[] Headers { get; }
 
-        int ReviewId { get; }
+        int Id { get; }
 
         DataRecord this[string word] { get; }
 

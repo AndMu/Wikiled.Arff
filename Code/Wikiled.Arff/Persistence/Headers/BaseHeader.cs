@@ -7,7 +7,7 @@ namespace Wikiled.Arff.Persistence.Headers
 {
     public abstract class BaseHeader : IHeader
     {
-        private readonly ConcurrentDictionary<int, int> reviews = new ConcurrentDictionary<int, int>();
+        private readonly ConcurrentDictionary<int, int> docs = new ConcurrentDictionary<int, int>();
 
         private string text;
 
@@ -20,7 +20,7 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public int Index { get; }
 
-        public int InReviews => reviews.Count;
+        public int Indocs => docs.Count;
 
         public string Name { get; }
 
@@ -53,9 +53,9 @@ namespace Wikiled.Arff.Persistence.Headers
             return text;
         }
 
-        public void Add(int reviewId)
+        public void Add(int docId)
         {
-            reviews.TryAdd(reviewId, reviewId);
+            docs.TryAdd(docId, docId);
         }
 
         public void CheckSupport(object value)
@@ -66,9 +66,9 @@ namespace Wikiled.Arff.Persistence.Headers
             }
         }
 
-        public bool Contains(int reviewId)
+        public bool Contains(int docId)
         {
-            return reviews.ContainsKey(reviewId);
+            return docs.ContainsKey(docId);
         }
 
         public string ReadValue(DataRecord record)
@@ -82,10 +82,10 @@ namespace Wikiled.Arff.Persistence.Headers
             return ReadValueInternal(record);
         }
 
-        public void Remove(int reviewId)
+        public void Remove(int docId)
         {
             int removed;
-            reviews.TryRemove(reviewId, out removed);
+            docs.TryRemove(docId, out removed);
         }
 
         protected abstract string GetAdditionalText();

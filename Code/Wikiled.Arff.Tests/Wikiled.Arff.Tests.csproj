@@ -73,7 +73,7 @@
     <Compile Include="Persistency\Headers\NominalHeaderTests.cs" />
     <Compile Include="Persistency\Headers\NumericHeaderTests.cs" />
     <Compile Include="Persistency\Headers\StringHeaderTests.cs" />
-    <Compile Include="Persistency\ReviewsDataHolderTests.cs" />
+    <Compile Include="Persistency\ArffDataSetTests.cs" />
     <Compile Include="Persistency\SparseInformationLineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

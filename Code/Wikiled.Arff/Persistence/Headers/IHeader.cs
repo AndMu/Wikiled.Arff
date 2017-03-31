@@ -8,15 +8,15 @@ namespace Wikiled.Arff.Persistence.Headers
 
         object Source { get; set; }
 
-        void Remove(int reviewId);
+        void Remove(int docId);
 
-        bool Contains(int reviewId);
+        bool Contains(int docId);
 
         string ReadValue(DataRecord record);
 
-        int InReviews { get; }
+        int Indocs { get; }
 
-        void Add(int reviewId);
+        void Add(int docId);
 
         object Parse(string text);
 

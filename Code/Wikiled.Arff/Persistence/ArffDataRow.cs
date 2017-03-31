@@ -16,9 +16,9 @@ namespace Wikiled.Arff.Persistence
 
         private readonly ConcurrentDictionary<IHeader, DataRecord> records = new ConcurrentDictionary<IHeader, DataRecord>();
 
-        internal ArffDataRow(int reviewId, IArffDataSet dataSet)
+        internal ArffDataRow(int docId, IArffDataSet dataSet)
         {
-            ReviewId = reviewId;
+            Id = docId;
             this.dataSet = dataSet;
             if (dataSet.Header.Class != null)
             {
@@ -48,7 +48,7 @@ namespace Wikiled.Arff.Persistence
 
         public IHeader[] Headers => records.Keys.ToArray();
 
-        public int ReviewId { get; }
+        public int Id { get; }
 
         public DataRecord this[string word]
         {
@@ -78,9 +78,9 @@ namespace Wikiled.Arff.Persistence
                 data.Increment();
             }
 
-            if (!existing.Contains(ReviewId))
+            if (!existing.Contains(Id))
             {
-                existing.Add(ReviewId);
+                existing.Add(Id);
             }
 
             return data;

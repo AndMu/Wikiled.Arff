@@ -10,9 +10,9 @@ namespace Wikiled.Arff.Persistence
 
         NormalizationType Normalization { get; }
 
-        IArffDataRow[] Reviews { get; }
+        IArffDataRow[] Documents { get; }
 
-        int TotalReviews { get; }
+        int TotalDocuments { get; }
 
         bool UseTotal { get; set; }
 
@@ -20,13 +20,13 @@ namespace Wikiled.Arff.Persistence
 
         void Save(StreamWriter stream);
 
-        IArffDataRow AddReview();
+        IArffDataRow AddDocument();
 
-        IArffDataRow GetReview(int reviewId);
+        IArffDataRow GetDocument(int documentId);
 
         void Normalize(NormalizationType type);
 
         void Clear();
 
-        void RemoveReview(int reviewId);}
+        void RemoveDocument(int documentId);}
 }

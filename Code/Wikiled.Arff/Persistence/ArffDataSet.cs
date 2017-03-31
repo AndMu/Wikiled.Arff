@@ -17,9 +17,9 @@ namespace Wikiled.Arff.Persistence
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        private readonly ConcurrentDictionary<int, IArffDataRow> reviews = new ConcurrentDictionary<int, IArffDataRow>();
+        private readonly ConcurrentDictionary<int, IArffDataRow> documents = new ConcurrentDictionary<int, IArffDataRow>();
 
-        private int internalReviewsOffset = 100000;
+        private int internalDocumentsOffset = 100000;
 
         private Func<IEnumerable<IArffDataRow>, IEnumerable<IArffDataRow>> sort;
 
@@ -37,13 +37,13 @@ namespace Wikiled.Arff.Persistence
             this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
         }
 
-        public IArffDataRow[] Reviews => (from item in reviews select item.Value).ToArray();
+        public IArffDataRow[] Documents => (from item in documents select item.Value).ToArray();
 
         public IHeadersWordsHandling Header { get; }
 
         public NormalizationType Normalization { get; private set; }
 
-        public int TotalReviews => reviews.Count;
+        public int TotalDocuments => documents.Count;
 
         public bool UseTotal
         {
@@ -62,7 +62,7 @@ namespace Wikiled.Arff.Persistence
         public void Clear()
         {
             Normalization = NormalizationType.None;
-            reviews.Clear();
+            documents.Clear();
         }
 
         public void Normalize(NormalizationType type)
@@ -78,9 +78,9 @@ namespace Wikiled.Arff.Persistence
             }
 
             Normalization = type;
-            foreach (var review in Reviews)
+            foreach (var doc in Documents)
             {
-                var words = review.GetRecords()
+                var words = doc.GetRecords()
                     .Where(item => item.Header is NumericHeader)
                     .ToArray();
 
@@ -97,33 +97,33 @@ namespace Wikiled.Arff.Persistence
             }
         }
 
-        public void RemoveReview(int reviewId)
+        public void RemoveDocument(int documentId)
         {
-            var review = GetReview(reviewId);
-            if (review != null)
+            var doc = GetDocument(documentId);
+            if (doc != null)
             {
-                foreach (var headers in review.Headers)
+                foreach (var headers in doc.Headers)
                 {
-                    headers.Remove(review.ReviewId);
+                    headers.Remove(doc.Id);
                 }
 
-                reviews.TryRemove(reviewId, out review);
+                documents.TryRemove(documentId, out doc);
             }
             else
             {
-                log.Warn("Review not found: {0}", reviewId);
+                log.Warn("Document not found: {0}", documentId);
             }
         }
 
-        public IArffDataRow AddReview()
+        public IArffDataRow AddDocument()
         {
             if (Normalization != NormalizationType.None)
             {
-                throw new ArgumentException("Can't add new review to normalized dataset");
+                throw new ArgumentException("Can't add new document to normalized dataset");
             }
 
-            Interlocked.Increment(ref internalReviewsOffset);
-            return GetReview(internalReviewsOffset);
+            Interlocked.Increment(ref internalDocumentsOffset);
+            return GetDocument(internalDocumentsOffset);
         }
 
         public void Save(string fileName)
@@ -137,9 +137,9 @@ namespace Wikiled.Arff.Persistence
         public void Save(StreamWriter stream)
         {
             stream.WriteLine(ToString());
-            foreach (var review in Reviews)
+            foreach (var doc in Documents)
             {
-                var text = review.ToString();
+                var text = doc.ToString();
                 if (string.IsNullOrEmpty(text))
                 {
                     return;
@@ -149,16 +149,16 @@ namespace Wikiled.Arff.Persistence
             }
         }
 
-        public IArffDataRow GetReview(int reviewId)
+        public IArffDataRow GetDocument(int documentId)
         {
-            IArffDataRow review;
-            if (!reviews.TryGetValue(reviewId, out review))
+            IArffDataRow doc;
+            if (!documents.TryGetValue(documentId, out doc))
             {
-                review = new ArffDataRow(reviewId, this);
-                reviews[reviewId] = review;
+                doc = new ArffDataRow(documentId, this);
+                documents[documentId] = doc;
             }
 
-            return review;
+            return doc;
         }
 
         public static IArffDataSet Create<T>(string name)
@@ -178,13 +178,13 @@ namespace Wikiled.Arff.Persistence
 
         public static IArffDataSet CreateDataRecord<T>(string[] types)
         {
-            var reviewHolder = Create<T>("Data");
+            var documentHolder = Create<T>("Data");
             foreach (var word in types)
             {
-                reviewHolder.Header.RegisterNumeric(word);
+                documentHolder.Header.RegisterNumeric(word);
             }
 
-            return reviewHolder;
+            return documentHolder;
         }
 
         public static IArffDataSet CreateFixed(IHeadersWordsHandling header, string name)
@@ -252,27 +252,27 @@ namespace Wikiled.Arff.Persistence
                 }
             }
 
-            var reviewHolder = factory(name);
-            reviewHolder.Header.CreateHeader = false;
+            var docHolder = factory(name);
+            docHolder.Header.CreateHeader = false;
             foreach (var headerItem in headers)
             {
-                reviewHolder.Header.Parse(headerItem);
+                docHolder.Header.Parse(headerItem);
             }
 
             while ((line = streamReader.ReadLine()) != null)
             {
                 var currentLine = line;
-                ProcessLine(reviewHolder, currentLine);
+                ProcessLine(docHolder, currentLine);
             }
 
-            return reviewHolder;
+            return docHolder;
         }
 
-        private static void ProcessLine(IArffDataSet reviewHolder, string line)
+        private static void ProcessLine(IArffDataSet docHolder, string line)
         {
             line = line.Replace("{", string.Empty);
             line = line.Replace("}", string.Empty);
-            var review = reviewHolder.AddReview();
+            var doc = docHolder.AddDocument();
             foreach (var item in line.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var itemBlocks = item.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -283,8 +283,8 @@ namespace Wikiled.Arff.Persistence
                 }
 
                 var index = int.Parse(itemBlocks[0]);
-                var header = reviewHolder.Header.GetByIndex(index);
-                var wordItem = review.Resolve(header);
+                var header = docHolder.Header.GetByIndex(index);
+                var wordItem = doc.Resolve(header);
                 wordItem.Value = header.Parse(itemBlocks.Skip(1).AccumulateItems(" "));
             }
         }
@@ -314,9 +314,9 @@ namespace Wikiled.Arff.Persistence
 
         private void HeaderWordsRemoved(object sender, HeaderEventArgs e)
         {
-            foreach (var review in Reviews)
+            foreach (var doc in Documents)
             {
-                review.Remove(e.Header);
+                doc.Remove(e.Header);
             }
         }
     }
