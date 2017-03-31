@@ -37,20 +37,6 @@ namespace Wikiled.Arff.Persistence
             this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
         }
 
-        public Func<IEnumerable<IArffDataRow>, IEnumerable<IArffDataRow>> Sort
-        {
-            get
-            {
-                if (sort == null)
-                {
-                    return item => item;
-                }
-
-                return sort;
-            }
-            set { sort = value; }
-        }
-
         public IArffDataRow[] Reviews => (from item in reviews select item.Value).ToArray();
 
         public IHeadersWordsHandling Header { get; }
