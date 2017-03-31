@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence.Headers;
@@ -10,7 +11,7 @@ namespace Wikiled.Arff.Persistence
 
         NormalizationType Normalization { get; }
 
-        IArffDataRow[] Documents { get; }
+        IEnumerable<IArffDataRow> Documents { get; }
 
         int TotalDocuments { get; }
 

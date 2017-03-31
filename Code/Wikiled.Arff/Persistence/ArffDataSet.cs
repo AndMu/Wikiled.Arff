@@ -37,7 +37,7 @@ namespace Wikiled.Arff.Persistence
             this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
         }
 
-        public IArffDataRow[] Documents => (from item in documents select item.Value).ToArray();
+        public IEnumerable<IArffDataRow> Documents => (from item in documents select item.Value);
 
         public IHeadersWordsHandling Header { get; }
 

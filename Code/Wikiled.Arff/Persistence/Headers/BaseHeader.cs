@@ -20,7 +20,7 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public int Index { get; }
 
-        public int Indocs => docs.Count;
+        public int InDocuments => docs.Count;
 
         public string Name { get; }
 

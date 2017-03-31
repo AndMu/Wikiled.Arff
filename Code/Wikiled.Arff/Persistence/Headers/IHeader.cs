@@ -14,7 +14,7 @@ namespace Wikiled.Arff.Persistence.Headers
 
         string ReadValue(DataRecord record);
 
-        int Indocs { get; }
+        int InDocuments { get; }
 
         void Add(int docId);
 

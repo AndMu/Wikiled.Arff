@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence;
@@ -229,13 +230,13 @@ namespace Wikiled.Arff.Tests.Persistency
             docsDataHolder.Save("Test.arff");
             var loaded = ArffDataSet.Load<PositivityType>("Test.arff");
             Assert.AreEqual(7, loaded.Header.Total);
-            Assert.AreEqual(1, loaded.Documents.Length);
-            Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", loaded.Documents[0].ToString());
+            Assert.AreEqual(1, loaded.Documents.Count());
+            Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
 
             loaded = ArffDataSet.LoadSimple("Test.arff");
             Assert.AreEqual(7, loaded.Header.Total);
-            Assert.AreEqual(1, loaded.Documents.Length);
-            Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", loaded.Documents[0].ToString());
+            Assert.AreEqual(1, loaded.Documents.Count());
+            Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
         }
 
 
@@ -250,8 +251,8 @@ namespace Wikiled.Arff.Tests.Persistency
             docsDataHolder.Save("Test.arff");
             var loaded = ArffDataSet.Load<PositivityType>("Test.arff");
             Assert.AreEqual(4, loaded.Header.Total);
-            Assert.AreEqual(1, loaded.Documents.Length);
-            Assert.AreEqual("{2 1,3 Negative}", loaded.Documents[0].ToString());
+            Assert.AreEqual(1, loaded.Documents.Count());
+            Assert.AreEqual("{2 1,3 Negative}", loaded.Documents.First().ToString());
         }
 
         [Test]
@@ -267,9 +268,9 @@ namespace Wikiled.Arff.Tests.Persistency
             docsDataHolder.Save("Test.arff");
             var loaded = ArffDataSet.Load<StarType>("Test.arff");
             Assert.AreEqual(4, loaded.Header.Total);
-            Assert.AreEqual(1, loaded.Documents.Length);
-            Assert.AreEqual("{0 1,3 Three}", loaded.Documents[0].ToString());
-            Assert.AreEqual(StarType.Three, loaded.Documents[0].Class.Value);
+            Assert.AreEqual(1, loaded.Documents.Count());
+            Assert.AreEqual("{0 1,3 Three}", loaded.Documents.First().ToString());
+            Assert.AreEqual(StarType.Three, loaded.Documents.First().Class.Value);
         }
 
         [Test]
@@ -290,9 +291,10 @@ namespace Wikiled.Arff.Tests.Persistency
             Assert.AreEqual(2, header.TotalDocuments);
             header.GetDocument(2);
             Assert.AreEqual(2, header.TotalDocuments);
-            Assert.AreEqual(2, header.Documents.Length);
-            header.Documents[0].Class.Value = StarType.Four;
-            Assert.AreEqual(StarType.Four, header.Documents[0].Class.Value);
+            Assert.AreEqual(2, header.Documents.Count());
+            var document = header.Documents.First();
+            document.Class.Value = StarType.Four;
+            Assert.AreEqual(StarType.Four, document.Class.Value);
         }
 
         [Test]
@@ -309,8 +311,9 @@ namespace Wikiled.Arff.Tests.Persistency
             doc.AddRecord("3");
             doc.Class.Value = PositivityType.Negative;
             Assert.AreEqual(2, header.TotalDocuments);
-            Assert.AreEqual("{0 1,1 1,3 Positive}", header.Documents[0].ToString());
-            Assert.AreEqual("{1 1,2 1,3 Negative}", header.Documents[1].ToString());
+            var docs = header.Documents.ToArray();
+            Assert.AreEqual("{0 1,1 1,3 Positive}", docs[0].ToString());
+            Assert.AreEqual("{1 1,2 1,3 Negative}", docs[1].ToString());
             Assert.AreEqual(string.Format("@RELATION Data{0}" +
                             "@ATTRIBUTE 1 NUMERIC{0}" +
                             "@ATTRIBUTE 2 NUMERIC{0}" +
