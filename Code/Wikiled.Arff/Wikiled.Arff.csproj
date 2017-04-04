@@ -61,8 +61,6 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Data\DataLine.cs" />
-    <Compile Include="Data\Node.cs" />
     <Compile Include="Normalization\BaseNormalize.cs" />
     <Compile Include="Normalization\ElasticNormalization.cs" />
     <Compile Include="Normalization\INormalize.cs" />

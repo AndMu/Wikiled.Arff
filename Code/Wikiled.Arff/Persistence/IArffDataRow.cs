@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using Wikiled.Arff.Data;
 using Wikiled.Arff.Persistence.Headers;
 
 namespace Wikiled.Arff.Persistence
 {
     public interface IArffDataRow
     {
+        IArffDataSet Owner { get; }
+
         int Count { get; }
 
         DataRecord Class { get; }
@@ -23,8 +24,6 @@ namespace Wikiled.Arff.Persistence
         bool Contains(IHeader header);
 
         DataRecord[] GetRecords();
-
-        void ProcessLine(DataLine line);
 
         void Remove(IHeader header);
 

@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Wikiled.Arff.Data;
 using Wikiled.Arff.Persistence.Headers;
 using Wikiled.Core.Utility.Arguments;
 
@@ -12,19 +11,20 @@ namespace Wikiled.Arff.Persistence
     {
         private readonly DataRecord classRecord;
 
-        private readonly IArffDataSet dataSet;
-
         private readonly ConcurrentDictionary<IHeader, DataRecord> records = new ConcurrentDictionary<IHeader, DataRecord>();
 
         internal ArffDataRow(int docId, IArffDataSet dataSet)
         {
             Id = docId;
-            this.dataSet = dataSet;
+            Guard.NotNull(() => dataSet, dataSet);
+            Owner = dataSet;
             if (dataSet.Header.Class != null)
             {
                 classRecord = new DataRecord(dataSet.Header.Class);
             }
         }
+
+        public IArffDataSet Owner { get; }
 
         public int Count => records.Count;
 
@@ -37,7 +37,7 @@ namespace Wikiled.Arff.Persistence
                     throw new ArgumentOutOfRangeException("No class defined");
                 }
 
-                if (classRecord.Header != dataSet.Header.Class)
+                if (classRecord.Header != Owner.Header.Class)
                 {
                     throw new InvalidOperationException("Can't change dataset class");
                 }
@@ -54,10 +54,10 @@ namespace Wikiled.Arff.Persistence
         {
             get
             {
-                IHeader header = dataSet.Header[word];
+                IHeader header = Owner.Header[word];
                 if (header == null)
                 {
-                    throw new ArgumentNullException("word", "Unknown header " + word);
+                    throw new ArgumentNullException(nameof(word), "Unknown header " + word);
                 }
 
                 return records.ContainsKey(header) ? records[header] : null;
@@ -66,14 +66,14 @@ namespace Wikiled.Arff.Persistence
 
         public DataRecord Resolve(IHeader header)
         {
-            IHeader existing = dataSet.Header[header.Name];
+            IHeader existing = Owner.Header[header.Name];
             if (existing == null)
             {
                 return null;
             }
 
             DataRecord data = GetCreateRecord(existing);
-            if (data.Header != dataSet.Header.Class)
+            if (data.Header != Owner.Header.Class)
             {
                 data.Increment();
             }
@@ -102,32 +102,6 @@ namespace Wikiled.Arff.Persistence
             return records.Select(item => item.Value).ToArray();
         }
 
-        public void ProcessLine(DataLine line)
-        {
-            var indexes = new Dictionary<int, double>();
-            foreach (var wordsData in records)
-            {
-                if (wordsData.Value.Header is DateHeader)
-                {
-                    continue;
-                }
-
-                int index = dataSet.Header.GetIndex(wordsData.Key);
-                double value = 1;
-                if (wordsData.Value.Value != null)
-                {
-                    value = Convert.ToDouble(wordsData.Value.Value);
-                }
-
-                indexes[index] = value;
-            }
-
-            foreach (var index in indexes.OrderBy(item => item.Key))
-            {
-                line.SetValue(index.Key, index.Value);
-            }
-        }
-
         public void Remove(IHeader header)
         {
             DataRecord data;
@@ -137,7 +111,7 @@ namespace Wikiled.Arff.Persistence
         public DataRecord SetRecord(DataRecord oldRecord)
         {
             Guard.NotNull(() => oldRecord, oldRecord);
-            IHeader header = dataSet.Header[oldRecord.Header.Name] ?? dataSet.Header.RegisterHeader(oldRecord.Header);
+            IHeader header = Owner.Header[oldRecord.Header.Name] ?? Owner.Header.RegisterHeader(oldRecord.Header);
             DataRecord value = GetCreateRecord(header);
             value.Total = oldRecord.Total;
             value.Value = oldRecord.Value;
@@ -146,9 +120,9 @@ namespace Wikiled.Arff.Persistence
 
         public IEnumerable<DataRecord> GetFullView()
         {
-            for (int i = 0; i < dataSet.Header.Total; i++)
+            for (int i = 0; i < Owner.Header.Total; i++)
             {
-                IHeader header = dataSet.Header.GetByIndex(i);
+                IHeader header = Owner.Header.GetByIndex(i);
                 DataRecord record;
                 if (records.TryGetValue(header, out record))
                 {
@@ -169,7 +143,7 @@ namespace Wikiled.Arff.Persistence
                 item => new
                 {
                     Item = item,
-                    Index = dataSet.Header.GetIndex(item.Key)
+                    Index = Owner.Header.GetIndex(item.Key)
                 })
                 .OrderBy(item => item.Index);
 
@@ -192,7 +166,7 @@ namespace Wikiled.Arff.Persistence
 
             if (classRecord != null)
             {
-                line.Add(dataSet.Header.Total - 1, classRecord.Header.ReadValue(classRecord));
+                line.Add(Owner.Header.Total - 1, classRecord.Header.ReadValue(classRecord));
             }
 
             return line.GenerateLine();
@@ -206,7 +180,7 @@ namespace Wikiled.Arff.Persistence
                 return data;
             }
 
-            if (header == dataSet.Header.Class)
+            if (header == Owner.Header.Class)
             {
                 return Class;
             }
@@ -220,11 +194,11 @@ namespace Wikiled.Arff.Persistence
         {
             word = HeadersWordsHandling.GetRegularWord(word);
             Guard.NotNull(() => word, word);
-            IHeader header = dataSet.Header[word];
+            IHeader header = Owner.Header[word];
             if (header == null &&
-                dataSet.Header.CreateHeader)
+                Owner.Header.CreateHeader)
             {
-                header = dataSet.Header.RegisterNumeric(word);
+                header = Owner.Header.RegisterNumeric(word);
             }
 
             return header;
