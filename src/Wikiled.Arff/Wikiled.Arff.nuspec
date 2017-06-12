@@ -5,6 +5,7 @@
     <version>1.0.0</version>
     <authors>Wikiled</authors>
     <description>Wikiled Arff Library</description>
+    <projectUrl>https://github.com/AndMu/Wikiled.Arff</projectUrl>
   </metadata>
   <files>
     <file src="bin\Release\Wikiled.Arff.dll" target="lib\net462" />
