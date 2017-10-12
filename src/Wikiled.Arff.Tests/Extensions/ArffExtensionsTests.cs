@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Wikiled.Arff.Extensions;
 using Wikiled.Arff.Persistence;
@@ -25,7 +26,7 @@ namespace Wikiled.Arff.Tests.Extensions
         }      
 		
         [Test]
-        public void CompactHeader()
+        public async Task CompactHeader()
         {
             var dataSet = ArffDataSet.CreateSimple("Test");
             dataSet.Header.RegisterNumericClass();
@@ -40,7 +41,7 @@ namespace Wikiled.Arff.Tests.Extensions
             review2.AddRecord("Two");
             Assert.AreEqual(3, dataSet.Header.Total);
             Assert.AreEqual(11, dataSet.Documents.Count());
-            dataSet.CompactHeader(5);
+            await dataSet.CompactHeader(5).ConfigureAwait(false);
             Assert.AreEqual(2, dataSet.Header.Total);
             Assert.AreEqual(10, dataSet.Documents.Count());
             Assert.AreEqual(10, dataSet.Header["One"].InDocuments);
