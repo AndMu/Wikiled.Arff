@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using NLog;
 using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
 using Wikiled.Core.Utility.Arguments;
@@ -8,11 +11,13 @@ namespace Wikiled.Arff.Extensions
 {
     public static class ArffExtensions
     {
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         public static void CompactClass(this IArffDataSet dataSet, int minimum)
         {
             Guard.NotNull(() => dataSet, dataSet);
-            var classItem = dataSet.Header.Class as NominalHeader;
-            if (classItem == null)
+            log.Debug("CompactClass: {0}", minimum);
+            if (!(dataSet.Header.Class is NominalHeader classItem))
             {
                 throw new InvalidOperationException("Class not supported");
             }
@@ -30,9 +35,9 @@ namespace Wikiled.Arff.Extensions
         public static void RemoveClass(this IArffDataSet dataSet, string name)
         {
             Guard.NotNull(() => dataSet, dataSet);
+            log.Debug("RemoveClass: {0}", name);
             Guard.NotNullOrEmpty(() => name, name);
-            var classItem = dataSet.Header.Class as NominalHeader;
-            if (classItem == null)
+            if (!(dataSet.Header.Class is NominalHeader classItem))
             {
                 throw new InvalidOperationException("Class not supported");
             }
@@ -49,9 +54,11 @@ namespace Wikiled.Arff.Extensions
             classItem.Nominals = classItem.Nominals.Where(item => item != name).ToArray();
         }
 
-        public static void CompactHeader(this IArffDataSet dataSet, int minOccurences)
+        public static async Task CompactHeader(this IArffDataSet dataSet, int minOccurences)
         {
             Guard.NotNull(() => dataSet, dataSet);
+            log.Debug("CompactHeader: {0}", minOccurences);
+            List<Task> tasks = new List<Task>();
             foreach (var header in dataSet.Header.ToArray())
             {
                 if (header == dataSet.Header.Class)
@@ -61,16 +68,18 @@ namespace Wikiled.Arff.Extensions
 
                 if (header.InDocuments <= minOccurences)
                 {
-                    dataSet.Header.Remove(header);
+                    tasks.Add(Task.Run(() => dataSet.Header.Remove(header)));
                 }
             }
 
+            await Task.WhenAll(tasks).ConfigureAwait(false);
             dataSet.CompactReviews(0);
         }
 
         public static void CompactReviews(this IArffDataSet dataSet, int minReviewSize)
         {
             Guard.NotNull(() => dataSet, dataSet);
+            log.Debug("CompactReviews: {0}", minReviewSize);
             foreach (var review in dataSet.Documents.ToArray())
             {
                 if (review.Count <= minReviewSize)

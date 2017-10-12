@@ -104,8 +104,7 @@ namespace Wikiled.Arff.Persistence
 
         public void Remove(IHeader header)
         {
-            DataRecord data;
-            records.TryRemove(header, out data);
+            records.TryRemove(header, out _);
         }
 
         public DataRecord SetRecord(DataRecord oldRecord)
