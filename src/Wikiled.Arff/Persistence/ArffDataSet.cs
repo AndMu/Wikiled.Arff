@@ -305,8 +305,7 @@ namespace Wikiled.Arff.Persistence
 
         private void HeaderWordsOnAdded(object sender, HeaderEventArgs headerEventArgs)
         {
-            var header = headerEventArgs.Header as NumericHeader;
-            if (header != null)
+            if (headerEventArgs.Header is NumericHeader header)
             {
                 header.UseCount = UseTotal;
             }

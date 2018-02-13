@@ -345,13 +345,13 @@ namespace Wikiled.Arff.Persistence.Headers
                 {
                     Class = null;
                 }
-
-                Removed?.Invoke(this, new HeaderEventArgs(header));
             }
             finally
             {
                 syncSlim.ExitWriteLock();
             }
+
+            Removed?.Invoke(this, new HeaderEventArgs(header));
         }
 
         IEnumerator IEnumerable.GetEnumerator()
