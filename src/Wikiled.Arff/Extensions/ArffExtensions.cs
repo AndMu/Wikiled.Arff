@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using NLog;
 using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
-using Wikiled.Core.Utility.Arguments;
+using Wikiled.Common.Arguments;
 
 namespace Wikiled.Arff.Extensions
 {

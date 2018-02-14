@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Wikiled.Core.Utility.Arguments;
+using Wikiled.Common.Arguments;
 
 namespace Wikiled.Arff.Persistence.Headers
 {

@@ -8,8 +8,8 @@ using System.Threading;
 using NLog;
 using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence.Headers;
-using Wikiled.Core.Utility.Arguments;
-using Wikiled.Core.Utility.Extensions;
+using Wikiled.Common.Arguments;
+using Wikiled.Common.Extensions;
 
 namespace Wikiled.Arff.Persistence
 {
@@ -19,13 +19,13 @@ namespace Wikiled.Arff.Persistence
 
         private readonly ConcurrentDictionary<int, IArffDataRow> documents = new ConcurrentDictionary<int, IArffDataRow>();
 
+        private readonly string name;
+
         private int internalDocumentsOffset = 100000;
 
         private Func<IEnumerable<IArffDataRow>, IEnumerable<IArffDataRow>> sort;
 
         private bool useTotal;
-
-        private readonly string name;
 
         private ArffDataSet(IHeadersWordsHandling header, string name)
         {
@@ -37,7 +37,7 @@ namespace Wikiled.Arff.Persistence
             this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
         }
 
-        public IEnumerable<IArffDataRow> Documents => (from item in documents select item.Value);
+        public IEnumerable<IArffDataRow> Documents => from item in documents select item.Value;
 
         public IHeadersWordsHandling Header { get; }
 
@@ -59,10 +59,110 @@ namespace Wikiled.Arff.Persistence
             }
         }
 
+        public static IArffDataSet Create<T>(string name)
+        {
+            var dataSet = new ArffDataSet(new HeadersWordsHandling(), name);
+            dataSet.Header.CreateHeader = true;
+            dataSet.Header.RegisterEnumClass<T>();
+            return dataSet;
+        }
+
+        public static IArffDataSet CreateDataRecord<T>(string[] types)
+        {
+            var documentHolder = Create<T>("Data");
+            foreach (var word in types)
+            {
+                documentHolder.Header.RegisterNumeric(word);
+            }
+
+            return documentHolder;
+        }
+
+        public static IArffDataSet CreateFixed(IHeadersWordsHandling header, string name)
+        {
+            var dataSet = new ArffDataSet(header, name);
+            dataSet.Header.CreateHeader = false;
+            return dataSet;
+        }
+
+        public static IArffDataSet CreateSimple(string name)
+        {
+            var dataSet = new ArffDataSet(new HeadersWordsHandling(), name);
+            dataSet.Header.CreateHeader = true;
+            return dataSet;
+        }
+
+        public static IArffDataSet Load<T>(string fileName)
+        {
+            Guard.NotNullOrEmpty(() => fileName, fileName);
+            using (var reader = new StreamReader(fileName))
+            {
+                return Load<T>(reader);
+            }
+        }
+
+        public static IArffDataSet Load<T>(StreamReader streamReader)
+        {
+            Guard.NotNull(() => streamReader, streamReader);
+            return LoadInternal(streamReader, Create<T>);
+        }
+
+        public static IArffDataSet LoadSimple(string fileName)
+        {
+            Guard.NotNullOrEmpty(() => fileName, fileName);
+            using (var reader = new StreamReader(fileName))
+            {
+                return LoadSimple(reader);
+            }
+        }
+
+        public static IArffDataSet LoadSimple(StreamReader streamReader)
+        {
+            Guard.NotNull(() => streamReader, streamReader);
+            return LoadInternal(streamReader, CreateSimple);
+        }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.AppendFormat("@RELATION {0}\r\n", name);
+
+            foreach (var item in Header)
+            {
+                builder.AppendFormat("{0}{1}", item, Environment.NewLine);
+            }
+
+            builder.Append("@DATA");
+            return builder.ToString();
+        }
+
+        public IArffDataRow AddDocument()
+        {
+            if (Normalization != NormalizationType.None)
+            {
+                throw new ArgumentException("Can't add new document to normalized dataset");
+            }
+
+            Interlocked.Increment(ref internalDocumentsOffset);
+            return GetDocument(internalDocumentsOffset);
+        }
+
         public void Clear()
         {
             Normalization = NormalizationType.None;
             documents.Clear();
+        }
+
+        public IArffDataRow GetDocument(int documentId)
+        {
+            IArffDataRow doc;
+            if (!documents.TryGetValue(documentId, out doc))
+            {
+                doc = new ArffDataRow(documentId, this);
+                documents[documentId] = doc;
+            }
+
+            return doc;
         }
 
         public void Normalize(NormalizationType type)
@@ -81,14 +181,14 @@ namespace Wikiled.Arff.Persistence
             foreach (var doc in Documents)
             {
                 var words = doc.GetRecords()
-                    .Where(item => item.Header is NumericHeader)
-                    .ToArray();
+                               .Where(item => item.Header is NumericHeader)
+                               .ToArray();
 
                 var normalized = words
-                    .Select(item => Convert.ToDouble(item.Value))
-                    .Normalize(type)
-                    .GetNormalized
-                    .ToArray();
+                                 .Select(item => Convert.ToDouble(item.Value))
+                                 .Normalize(type)
+                                 .GetNormalized
+                                 .ToArray();
 
                 for (var i = 0; i < words.Length; i++)
                 {
@@ -115,17 +215,6 @@ namespace Wikiled.Arff.Persistence
             }
         }
 
-        public IArffDataRow AddDocument()
-        {
-            if (Normalization != NormalizationType.None)
-            {
-                throw new ArgumentException("Can't add new document to normalized dataset");
-            }
-
-            Interlocked.Increment(ref internalDocumentsOffset);
-            return GetDocument(internalDocumentsOffset);
-        }
-
         public void Save(string fileName)
         {
             using (var file = new StreamWriter(fileName))
@@ -147,81 +236,6 @@ namespace Wikiled.Arff.Persistence
 
                 stream.WriteLine(text);
             }
-        }
-
-        public IArffDataRow GetDocument(int documentId)
-        {
-            IArffDataRow doc;
-            if (!documents.TryGetValue(documentId, out doc))
-            {
-                doc = new ArffDataRow(documentId, this);
-                documents[documentId] = doc;
-            }
-
-            return doc;
-        }
-
-        public static IArffDataSet Create<T>(string name)
-        {
-            var dataSet = new ArffDataSet(new HeadersWordsHandling(), name);
-            dataSet.Header.CreateHeader = true;
-            dataSet.Header.RegisterEnumClass<T>();
-            return dataSet;
-        }
-
-        public static IArffDataSet CreateSimple(string name)
-        {
-            var dataSet = new ArffDataSet(new HeadersWordsHandling(), name);
-            dataSet.Header.CreateHeader = true;
-            return dataSet;
-        }
-
-        public static IArffDataSet CreateDataRecord<T>(string[] types)
-        {
-            var documentHolder = Create<T>("Data");
-            foreach (var word in types)
-            {
-                documentHolder.Header.RegisterNumeric(word);
-            }
-
-            return documentHolder;
-        }
-
-        public static IArffDataSet CreateFixed(IHeadersWordsHandling header, string name)
-        {
-            var dataSet = new ArffDataSet(header, name);
-            dataSet.Header.CreateHeader = false;
-            return dataSet;
-        }
-
-        public static IArffDataSet LoadSimple(string fileName)
-        {
-            Guard.NotNullOrEmpty(() => fileName, fileName);
-            using (var reader = new StreamReader(fileName))
-            {
-                return LoadSimple(reader);
-            }
-        }
-
-        public static IArffDataSet Load<T>(string fileName)
-        {
-            Guard.NotNullOrEmpty(() => fileName, fileName);
-            using (var reader = new StreamReader(fileName))
-            {
-                return Load<T>(reader);
-            }
-        }
-
-        public static IArffDataSet LoadSimple(StreamReader streamReader)
-        {
-            Guard.NotNull(() => streamReader, streamReader);
-            return LoadInternal(streamReader, CreateSimple);
-        }
-
-        public static IArffDataSet Load<T>(StreamReader streamReader)
-        {
-            Guard.NotNull(() => streamReader, streamReader);
-            return LoadInternal(streamReader, Create<T>);
         }
 
         private static IArffDataSet LoadInternal(StreamReader streamReader, Func<string, IArffDataSet> factory)
@@ -287,20 +301,6 @@ namespace Wikiled.Arff.Persistence
                 var wordItem = doc.Resolve(header);
                 wordItem.Value = header.Parse(itemBlocks.Skip(1).AccumulateItems(" "));
             }
-        }
-
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-            builder.AppendFormat("@RELATION {0}\r\n", name);
-
-            foreach (var item in Header)
-            {
-                builder.AppendFormat("{0}{1}", item, Environment.NewLine);
-            }
-
-            builder.Append("@DATA");
-            return builder.ToString();
         }
 
         private void HeaderWordsOnAdded(object sender, HeaderEventArgs headerEventArgs)

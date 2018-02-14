@@ -3,17 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Wikiled.Core.Utility.Arguments;
-using Wikiled.Core.Utility.Extensions;
+using Wikiled.Common.Arguments;
+using Wikiled.Common.Extensions;
 
 namespace Wikiled.Arff.Persistence.Headers
 {
     public class HeadersWordsHandling : IHeadersWordsHandling
     {
-        private readonly Dictionary<string, IHeader> headerTable =
-            new Dictionary<string, IHeader>(StringComparer.OrdinalIgnoreCase);
+        public event EventHandler<HeaderEventArgs> Added;
+
+        public event EventHandler<HeaderEventArgs> Removed;
 
         private readonly List<IHeader> headers = new List<IHeader>();
+
+        private readonly Dictionary<string, IHeader> headerTable =
+            new Dictionary<string, IHeader>(StringComparer.OrdinalIgnoreCase);
 
         private readonly ReaderWriterLockSlim syncSlim = new ReaderWriterLockSlim();
 
@@ -21,10 +25,6 @@ namespace Wikiled.Arff.Persistence.Headers
         {
             Register = true;
         }
-
-        public event EventHandler<HeaderEventArgs> Added;
-
-        public event EventHandler<HeaderEventArgs> Removed;
 
         public IClassHeader Class { get; private set; }
 
@@ -50,6 +50,21 @@ namespace Wikiled.Arff.Persistence.Headers
             }
         }
 
+        public static string GetRegularWord(string word)
+        {
+            if (IsReserved(word))
+            {
+                return word + "_word";
+            }
+
+            return word;
+        }
+
+        public static bool IsReserved(string word)
+        {
+            return string.Compare(word, "class", StringComparison.OrdinalIgnoreCase) == 0;
+        }
+
         public object Clone()
         {
             try
@@ -72,114 +87,6 @@ namespace Wikiled.Arff.Persistence.Headers
             {
                 syncSlim.ExitReadLock();
             }
-        }
-
-        public IHeader Parse(string line)
-        {
-            int index = line.IndexOf("@ATTRIBUTE", 0, StringComparison.OrdinalIgnoreCase);
-            if (index < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(line));
-            }
-
-            string name;
-            var quote = line.IndexOf("'");
-            var nextQuote = line.LastIndexOf("'");
-            string[] items;
-            if (quote > -1 &&
-                quote != nextQuote)
-            {
-                List<string> itemsCollect = new List<string>();
-                itemsCollect.Add("@ATTRIBUTE");
-                name = line.Substring(quote + 1, nextQuote - quote - 1);
-                itemsCollect.Add(name);
-                var remaining = line.Substring(nextQuote + 1).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                itemsCollect.AddRange(remaining);
-                items = itemsCollect.ToArray();
-            }
-            else
-            {
-                items = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (items.Length < 3)
-                {
-                    throw new ArgumentNullException(nameof(line), "Not enought blocks");
-                }
-
-                name = items[1].Trim();
-            }
-
-            
-
-            IHeader header;
-            if (headerTable.TryGetValue(name, out header))
-            {
-                if (header != Class)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(line), "Dublicate line");
-                }
-
-                return header;
-            }
-
-            index = line.IndexOf("{", 0);
-            if (index > 0)
-            {
-                int lastIndex = line.IndexOf("}", index);
-                if (index < 0)
-                {
-                    throw new ArgumentOutOfRangeException("line", "} not found");
-                }
-
-                line = line.Substring(index + 1, lastIndex - index - 1);
-                var childItems = line.Split(',').Select(item => item.Trim()).ToArray();
-                return string.Compare(name, "class", StringComparison.OrdinalIgnoreCase) == 0
-                    ? RegisterNominalClass(childItems)
-                    : RegisterNominal(name, childItems);
-            }
-
-            if (string.Compare(name, "class", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                return RegisterNumericClass();
-            }
-
-            if (NumericHeader.CanCreate(items))
-            {
-                return RegisterNumeric(name);
-            }
-
-            if (DateHeader.CanCreate(items))
-            {
-                return RegisterDate(name, items[3]);
-            }
-
-            if (StringHeader.CanCreate(items))
-            {
-                return RegisterString(name);
-            }
-
-            throw new ArgumentOutOfRangeException("line", "Can't parse line: " + line);
-        }
-
-        public IHeader RegisterHeader(IHeader header)
-        {
-            var numeric = header as DateHeader;
-            if (numeric != null)
-            {
-                return RegisterDate(numeric.Name, numeric.Format);
-            }
-
-            var stringHeader = header as StringHeader;
-            if (stringHeader != null)
-            {
-                return RegisterString(stringHeader.Name);
-            }
-
-            if (header is NumericHeader)
-            {
-                return RegisterNumeric(header.Name);
-            }
-
-            return RegisterString(header.Name);
         }
 
         public IHeader GetByIndex(int index)
@@ -221,6 +128,90 @@ namespace Wikiled.Arff.Persistence.Headers
             }
         }
 
+        public IHeader Parse(string line)
+        {
+            int index = line.IndexOf("@ATTRIBUTE", 0, StringComparison.OrdinalIgnoreCase);
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(line));
+            }
+
+            string name;
+            var quote = line.IndexOf("'");
+            var nextQuote = line.LastIndexOf("'");
+            string[] items;
+            if (quote > -1 &&
+                quote != nextQuote)
+            {
+                List<string> itemsCollect = new List<string>();
+                itemsCollect.Add("@ATTRIBUTE");
+                name = line.Substring(quote + 1, nextQuote - quote - 1);
+                itemsCollect.Add(name);
+                var remaining = line.Substring(nextQuote + 1).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                itemsCollect.AddRange(remaining);
+                items = itemsCollect.ToArray();
+            }
+            else
+            {
+                items = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (items.Length < 3)
+                {
+                    throw new ArgumentNullException(nameof(line), "Not enought blocks");
+                }
+
+                name = items[1].Trim();
+            }
+
+            IHeader header;
+            if (headerTable.TryGetValue(name, out header))
+            {
+                if (header != Class)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(line), "Dublicate line");
+                }
+
+                return header;
+            }
+
+            index = line.IndexOf("{", 0);
+            if (index > 0)
+            {
+                int lastIndex = line.IndexOf("}", index);
+                if (index < 0)
+                {
+                    throw new ArgumentOutOfRangeException("line", "} not found");
+                }
+
+                line = line.Substring(index + 1, lastIndex - index - 1);
+                var childItems = line.Split(',').Select(item => item.Trim()).ToArray();
+                return string.Compare(name, "class", StringComparison.OrdinalIgnoreCase) == 0
+                           ? RegisterNominalClass(childItems)
+                           : RegisterNominal(name, childItems);
+            }
+
+            if (string.Compare(name, "class", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                return RegisterNumericClass();
+            }
+
+            if (NumericHeader.CanCreate(items))
+            {
+                return RegisterNumeric(name);
+            }
+
+            if (DateHeader.CanCreate(items))
+            {
+                return RegisterDate(name, items[3]);
+            }
+
+            if (StringHeader.CanCreate(items))
+            {
+                return RegisterString(name);
+            }
+
+            throw new ArgumentOutOfRangeException("line", "Can't parse line: " + line);
+        }
+
         public DateHeader RegisterDate(string name, string format = "yyyy-MM-dd")
         {
             try
@@ -232,6 +223,59 @@ namespace Wikiled.Arff.Persistence.Headers
             {
                 syncSlim.ExitWriteLock();
             }
+        }
+
+        public EnumNominalHeader RegisterEnum<T>(string name)
+        {
+            try
+            {
+                syncSlim.EnterWriteLock();
+                return RegisterHeader(name, true, x => new EnumNominalHeader(Total, x, typeof(T)));
+            }
+            finally
+            {
+                syncSlim.ExitWriteLock();
+            }
+        }
+
+        public EnumNominalHeader RegisterEnumClass<T>()
+        {
+            try
+            {
+                syncSlim.EnterWriteLock();
+                EnumNominalHeader header = RegisterHeader(
+                    "class",
+                    false,
+                    x => new EnumNominalHeader(Total, x, typeof(T)));
+                RegisterClass(header);
+                return header;
+            }
+            finally
+            {
+                syncSlim.ExitWriteLock();
+            }
+        }
+
+        public IHeader RegisterHeader(IHeader header)
+        {
+            var numeric = header as DateHeader;
+            if (numeric != null)
+            {
+                return RegisterDate(numeric.Name, numeric.Format);
+            }
+
+            var stringHeader = header as StringHeader;
+            if (stringHeader != null)
+            {
+                return RegisterString(stringHeader.Name);
+            }
+
+            if (header is NumericHeader)
+            {
+                return RegisterNumeric(header.Name);
+            }
+
+            return RegisterString(header.Name);
         }
 
         public NominalHeader RegisterNominal(string name, params string[] nominals)
@@ -253,35 +297,6 @@ namespace Wikiled.Arff.Persistence.Headers
             {
                 syncSlim.EnterWriteLock();
                 NominalHeader header = RegisterHeader("class", false, x => new NominalHeader(Total, x, nominals));
-                RegisterClass(header);
-                return header;
-            }
-            finally
-            {
-                syncSlim.ExitWriteLock();
-            }
-        }
-
-        public EnumNominalHeader RegisterEnum<T>(string name)
-        {
-            try
-            {
-                syncSlim.EnterWriteLock();
-                return RegisterHeader(name, true, x => new EnumNominalHeader(Total, x, typeof (T)));
-            }
-            finally
-            {
-                syncSlim.ExitWriteLock();
-            }
-        }
-
-        public EnumNominalHeader RegisterEnumClass<T>()
-        {
-            try
-            {
-                syncSlim.EnterWriteLock();
-                EnumNominalHeader header = RegisterHeader("class", false,
-                    x => new EnumNominalHeader(Total, x, typeof (T)));
                 RegisterClass(header);
                 return header;
             }
@@ -354,24 +369,16 @@ namespace Wikiled.Arff.Persistence.Headers
             Removed?.Invoke(this, new HeaderEventArgs(header));
         }
 
+        private void AddHeader(IHeader header)
+        {
+            headerTable[header.Name] = header;
+            int totalRegistered = Class != null ? 1 : 0;
+            headers.Insert(headers.Count - totalRegistered, header);
+        }
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        public static string GetRegularWord(string word)
-        {
-            if (IsReserved(word))
-            {
-                return word + "_word";
-            }
-
-            return word;
-        }
-
-        public static bool IsReserved(string word)
-        {
-            return string.Compare(word, "class", StringComparison.OrdinalIgnoreCase) == 0;
         }
 
         private void RegisterClass(IClassHeader header)
@@ -407,20 +414,13 @@ namespace Wikiled.Arff.Persistence.Headers
             IHeader header;
             if (headerTable.TryGetValue(name, out header))
             {
-                return (T) header;
+                return (T)header;
             }
 
             header = create(name);
             AddHeader(header);
             Added?.Invoke(this, new HeaderEventArgs(header));
-            return (T) header;
-        }
-
-        private void AddHeader(IHeader header) 
-        {
-            headerTable[header.Name] = header;
-            int totalRegistered = Class != null ? 1 : 0;
-            headers.Insert(headers.Count - totalRegistered, header);
+            return (T)header;
         }
     }
 }

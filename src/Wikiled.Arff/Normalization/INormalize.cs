@@ -4,8 +4,10 @@ namespace Wikiled.Arff.Normalization
 {
     public interface INormalize
     {
-        IEnumerable<double> GetNormalized { get; }
         double Coeficient { get; }
+
+        IEnumerable<double> GetNormalized { get; }
+
         NormalizationType Type { get; }
     }
 }

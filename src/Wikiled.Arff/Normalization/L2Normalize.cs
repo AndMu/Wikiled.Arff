@@ -11,11 +11,11 @@ namespace Wikiled.Arff.Normalization
         {
         }
 
+        public override NormalizationType Type => NormalizationType.L2;
+
         protected override double CalculateCoef()
         {
-            return Math.Sqrt(source.Sum(item => item * item));
+            return Math.Sqrt(Source.Sum(item => item * item));
         }
-
-        public override NormalizationType Type => NormalizationType.L2;
     }
 }

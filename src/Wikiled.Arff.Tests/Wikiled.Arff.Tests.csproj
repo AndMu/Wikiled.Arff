@@ -9,8 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Crc32C.NET" version="1.0.5.0" />
-    <PackageReference Include="NLog" version="4.4.12" />
     <PackageReference Include="NUnit" version="3.7.1" />
     <PackageReference Include="NUnit.ConsoleRunner" version="3.7.0" />
     <PackageReference Include="NUnit.Extension.NUnitProjectLoader" version="3.6.0" />
@@ -19,10 +17,6 @@
     <PackageReference Include="NUnit.Extension.TeamCityEventListener" version="1.0.2" />
     <PackageReference Include="NUnit.Extension.VSProjectLoader" version="3.6.0" />
     <PackageReference Include="NUnit.Runners" version="3.7.0" />
-    <PackageReference Include="protobuf-net" version="2.3.2" />
-    <PackageReference Include="SharpZipLib" version="0.86.0" />
-    <PackageReference Include="Snappy.NET" version="1.1.1.8" />
-    <PackageReference Include="Wikiled.Core.Utility" version="2.1.16" />
   </ItemGroup>
 
   <ItemGroup>

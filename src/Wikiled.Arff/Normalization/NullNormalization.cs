@@ -9,14 +9,11 @@ namespace Wikiled.Arff.Normalization
         {
         }
 
+        public override NormalizationType Type => NormalizationType.None;
+
         protected override double CalculateCoef()
         {
             return 1;
-        }
-
-        public override NormalizationType Type
-        {
-            get { return NormalizationType.None; }
         }
     }
 }

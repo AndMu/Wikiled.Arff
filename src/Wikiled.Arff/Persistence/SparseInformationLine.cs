@@ -6,8 +6,11 @@ namespace Wikiled.Arff.Persistence
 {
     public class SparseInformationLine : IInformationLine
     {
-        private StringBuilder builder;
         private readonly Dictionary<int, string> data = new Dictionary<int, string>();
+
+        private StringBuilder builder;
+
+        public int Index { get; private set; }
 
         public void Add(int currentIndex, string value)
         {
@@ -36,21 +39,6 @@ namespace Wikiled.Arff.Persistence
             Add(Index - 1, value);
         }
 
-        public void MoveIndex(int index)
-        {
-            Index = index > Index ? index : Index;
-        }
-
-        private void AddItem(int currentIndex, string value)
-        {
-            if (builder.Length > 0)
-            {
-                builder.Append(',');
-            }
-
-            builder.Append(currentIndex + " " + value);
-        }
-
         public string GenerateLine()
         {
             if (builder != null)
@@ -69,6 +57,19 @@ namespace Wikiled.Arff.Persistence
             return builder.ToString();
         }
 
-        public int Index { get; private set; }
+        public void MoveIndex(int index)
+        {
+            Index = index > Index ? index : Index;
+        }
+
+        private void AddItem(int currentIndex, string value)
+        {
+            if (builder.Length > 0)
+            {
+                builder.Append(',');
+            }
+
+            builder.Append(currentIndex + " " + value);
+        }
     }
 }

@@ -6,20 +6,18 @@ namespace Wikiled.Arff.Normalization
 {
     public abstract class BaseNormalize : INormalize
     {
-        protected IEnumerable<double> source;
         private readonly Lazy<double> coeficient;
+
         private readonly Lazy<IEnumerable<double>> normalized;
 
         protected BaseNormalize(IEnumerable<double> source)
         {
-            this.source = source;
+            Source = source;
             coeficient = new Lazy<double>(CalculateCoef);
-            normalized = new Lazy<IEnumerable<double>>(() => source.Select(item =>  Math.Round(item / Coeficient, 10))); 
+            normalized = new Lazy<IEnumerable<double>>(() => source.Select(item => Math.Round(item / Coeficient, 10)));
         }
 
-        protected abstract double CalculateCoef();
-
-        public IEnumerable<double> GetNormalized => normalized.Value;
+        public abstract NormalizationType Type { get; }
 
         public double Coeficient
         {
@@ -30,6 +28,10 @@ namespace Wikiled.Arff.Normalization
             }
         }
 
-        public abstract NormalizationType Type { get; }
+        public IEnumerable<double> GetNormalized => normalized.Value;
+
+        protected IEnumerable<double> Source { get; }
+
+        protected abstract double CalculateCoef();
     }
 }

@@ -6,6 +6,40 @@ namespace Wikiled.Arff.Normalization
 {
     public static class SimpleNormalization
     {
+        public static T[] ArrayInit<T>(int size, Func<int, T> func)
+        {
+            var output = new T[size];
+            for (var i = 0; i < size; i++)
+            {
+                output[i] = func(i);
+            }
+
+            return output;
+        }
+
+        public static IEnumerable<double> ExponentialMovingAverage(this IEnumerable<double> list, int windowSize)
+        {
+            double multiplier = 2 / (double)(windowSize + 1);
+            double? previousExponentialMovingAverage = null;
+            foreach (var window in list.Windowed(windowSize))
+            {
+                double exponentialMovingAverage;
+                if (previousExponentialMovingAverage == null)
+                {
+                    exponentialMovingAverage = window.Average(x => x);
+                }
+                else
+                {
+                    double lastValue = window[window.Length - 1];
+                    exponentialMovingAverage = (lastValue - previousExponentialMovingAverage.Value) * multiplier +
+                                               previousExponentialMovingAverage.Value;
+                }
+
+                previousExponentialMovingAverage = exponentialMovingAverage;
+                yield return exponentialMovingAverage;
+            }
+        }
+
         public static IEnumerable<double> MeanNormalized(this IEnumerable<double> list, bool positive = false)
         {
             var data = list.ToArray();
@@ -47,6 +81,11 @@ namespace Wikiled.Arff.Normalization
             return data.Select(item => (item - substractor) / deviation);
         }
 
+        public static IEnumerable<double> MovingAverage(this IEnumerable<double> list, int windowSize)
+        {
+            return list.Windowed(windowSize).Select(item => item.Average(x => x));
+        }
+
         public static IEnumerable<double> WeightedMovingAverage(this IEnumerable<double> list, int windowSize)
         {
             foreach (var window in list.Windowed(windowSize))
@@ -64,37 +103,9 @@ namespace Wikiled.Arff.Normalization
             }
         }
 
-        public static IEnumerable<double> ExponentialMovingAverage(this IEnumerable<double> list, int windowSize)
-        {
-            double multiplier = 2 / (double)(windowSize + 1);
-            double? previousExponentialMovingAverage = null;
-            foreach (var window in list.Windowed(windowSize))
-            {
-                double exponentialMovingAverage;
-                if (previousExponentialMovingAverage == null)
-                {
-                    exponentialMovingAverage = window.Average(x => x);
-                }
-                else
-                {
-                    double lastValue = window[window.Length - 1];
-                    exponentialMovingAverage = (lastValue - previousExponentialMovingAverage.Value) * multiplier +
-                                               previousExponentialMovingAverage.Value;
-                }
-
-                previousExponentialMovingAverage = exponentialMovingAverage;
-                yield return exponentialMovingAverage;
-            }
-        }
-
-        public static IEnumerable<double> MovingAverage(this IEnumerable<double> list, int windowSize)
-        {
-            return list.Windowed(windowSize).Select(item => item.Average(x => x));
-        }
-
         public static IEnumerable<T[]> Windowed<T>(this IEnumerable<T> list, int windowSize)
         {
-            //Checks elided
+            // Checks elided
             var window = new T[windowSize];
             int r = windowSize - 1;
             int i = 0;
@@ -118,7 +129,7 @@ namespace Wikiled.Arff.Normalization
         }
 
         /// <summary>
-        /// Advanced and more expensive windowing version
+        ///     Advanced and more expensive windowing version
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
@@ -147,17 +158,6 @@ namespace Wikiled.Arff.Normalization
             {
                 yield return items.ToArray();
             }
-        }
-
-        public static T[] ArrayInit<T>(int size, Func<int, T> func)
-        {
-            var output = new T[size];
-            for (var i = 0; i < size; i++)
-            {
-                output[i] = func(i);
-            }
-
-            return output;
         }
     }
 }
