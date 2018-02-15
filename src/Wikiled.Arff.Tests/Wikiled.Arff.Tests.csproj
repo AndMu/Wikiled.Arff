@@ -9,14 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" version="3.7.1" />
-    <PackageReference Include="NUnit.ConsoleRunner" version="3.7.0" />
+    <PackageReference Include="NUnit" version="3.9.0" />
+    <PackageReference Include="NUnit.ConsoleRunner" version="3.8.0" />
     <PackageReference Include="NUnit.Extension.NUnitProjectLoader" version="3.6.0" />
     <PackageReference Include="NUnit.Extension.NUnitV2Driver" version="3.7.0" />
     <PackageReference Include="NUnit.Extension.NUnitV2ResultWriter" version="3.6.0" />
-    <PackageReference Include="NUnit.Extension.TeamCityEventListener" version="1.0.2" />
-    <PackageReference Include="NUnit.Extension.VSProjectLoader" version="3.6.0" />
-    <PackageReference Include="NUnit.Runners" version="3.7.0" />
+    <PackageReference Include="NUnit.Extension.TeamCityEventListener" version="1.0.3" />
+    <PackageReference Include="NUnit.Extension.VSProjectLoader" version="3.7.0" />
+    <PackageReference Include="NUnit.Runners" version="3.8.0" />
   </ItemGroup>
 
   <ItemGroup>

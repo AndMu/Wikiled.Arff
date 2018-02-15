@@ -11,8 +11,8 @@
     <Description>Wikiled Arff Library</Description>
     <projectUrl>https://github.com/AndMu/Wikiled.Arff</projectUrl>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2PAssets</TargetsForTfmSpecificBuildOutput>
-	<Tags>arff, weka, data-mining, machine-learning<\Tags>
-	<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <tags>arff, weka, data-mining, machine-learning</tags>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <Target Name="IncludeP2PAssets">
@@ -24,8 +24,8 @@
 
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.4.12" />
-    <PackageReference Include="Wikiled.Common" Version="1.0.2" />
-    
+    <PackageReference Include="Wikiled.Common" Version="1.0.3" />
+
   </ItemGroup>
 
 </Project>
