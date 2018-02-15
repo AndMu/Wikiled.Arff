@@ -23,8 +23,6 @@ namespace Wikiled.Arff.Persistence
 
         private int internalDocumentsOffset = 100000;
 
-        private Func<IEnumerable<IArffDataRow>, IEnumerable<IArffDataRow>> sort;
-
         private bool useTotal;
 
         private ArffDataSet(IHeadersWordsHandling header, string name)
