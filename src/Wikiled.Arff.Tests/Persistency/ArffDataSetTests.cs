@@ -11,6 +11,14 @@ namespace Wikiled.Arff.Tests.Persistency
     [TestFixture]
     public class ArffDataHolderTests
     {
+        private string fileName;
+
+        [SetUp]
+        public void Setup()
+        {
+            fileName = Path.Combine(TestContext.CurrentContext.TestDirectory, "Test.arff");
+        }
+
         [Test]
         public void ReservedWordAdded()
         {
@@ -227,13 +235,13 @@ namespace Wikiled.Arff.Tests.Persistency
             item.AddRecord("Comment").Value = "Added new record";
             Assert.AreEqual(7, docsDataHolder.Header.Total);
             Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", item.ToString());
-            docsDataHolder.Save("Test.arff");
-            var loaded = ArffDataSet.Load<PositivityType>("Test.arff");
+            docsDataHolder.Save(fileName);
+            var loaded = ArffDataSet.Load<PositivityType>(fileName);
             Assert.AreEqual(7, loaded.Header.Total);
             Assert.AreEqual(1, loaded.Documents.Count());
             Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
 
-            loaded = ArffDataSet.LoadSimple("Test.arff");
+            loaded = ArffDataSet.LoadSimple(fileName);
             Assert.AreEqual(7, loaded.Header.Total);
             Assert.AreEqual(1, loaded.Documents.Count());
             Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
@@ -248,8 +256,8 @@ namespace Wikiled.Arff.Tests.Persistency
             var item = docsDataHolder.AddDocument();
             item.AddRecord("c");
             item.Class.Value = PositivityType.Negative;
-            docsDataHolder.Save("Test.arff");
-            var loaded = ArffDataSet.Load<PositivityType>("Test.arff");
+            docsDataHolder.Save(fileName);
+            var loaded = ArffDataSet.Load<PositivityType>(fileName);
             Assert.AreEqual(4, loaded.Header.Total);
             Assert.AreEqual(1, loaded.Documents.Count());
             Assert.AreEqual("{2 1,3 Negative}", loaded.Documents.First().ToString());
@@ -265,12 +273,13 @@ namespace Wikiled.Arff.Tests.Persistency
             item.Class.Value = StarType.Three;
             Assert.AreEqual("{0 1,3 Three}", item.ToString());
             Assert.AreEqual(4, docsDataHolder.Header.Total);
-            docsDataHolder.Save("Test.arff");
-            var loaded = ArffDataSet.Load<StarType>("Test.arff");
+            docsDataHolder.Save(fileName);
+            var loaded = ArffDataSet.Load<StarType>(fileName);
             Assert.AreEqual(4, loaded.Header.Total);
             Assert.AreEqual(1, loaded.Documents.Count());
             Assert.AreEqual("{0 1,3 Three}", loaded.Documents.First().ToString());
             Assert.AreEqual(StarType.Three, loaded.Documents.First().Class.Value);
+            docsDataHolder.SaveCsv(Path.Combine(TestContext.CurrentContext.TestDirectory, "Test.csv"));
         }
 
         [Test]

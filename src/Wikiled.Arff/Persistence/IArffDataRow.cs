@@ -13,6 +13,8 @@ namespace Wikiled.Arff.Persistence
 
         IHeader[] Headers { get; }
 
+        IDictionary<IHeader, DataRecord> HeadersTable { get; }
+
         int Id { get; }
 
         DataRecord this[string word] { get; }

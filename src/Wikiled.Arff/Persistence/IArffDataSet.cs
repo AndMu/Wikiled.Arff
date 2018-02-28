@@ -29,5 +29,8 @@ namespace Wikiled.Arff.Persistence
 
         void Clear();
 
-        void RemoveDocument(int documentId);}
+        void RemoveDocument(int documentId);
+
+        void SaveCsv(string fileName);
+    }
 }

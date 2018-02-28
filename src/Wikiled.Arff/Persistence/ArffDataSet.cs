@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using CsvHelper;
 using NLog;
 using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence.Headers;
@@ -210,6 +211,40 @@ namespace Wikiled.Arff.Persistence
             else
             {
                 log.Warn("Document not found: {0}", documentId);
+            }
+        }
+
+        public void SaveCsv(string fileName)
+        {
+            using (var streamWriter = new StreamWriter(fileName, false))
+            using (var csvDataOut = new CsvWriter(streamWriter))
+            {                
+                var headers = Header.ToArray();
+                foreach (var header in headers)
+                {
+                    csvDataOut.WriteField(header.Name);
+                }
+
+                csvDataOut.NextRecord();
+                foreach (var doc in Documents)
+                {
+                    foreach (var header in headers)
+                    {
+                        string value;
+                        if (doc.Class.Header == header)
+                        {
+                            value = header.ReadValue(doc.Class);
+                        }
+                        else
+                        {
+                            value = doc.HeadersTable.TryGetValue(header, out var record) ? header.ReadValue(record) : null;
+                        }
+                        
+                        csvDataOut.WriteField(value);
+                    }
+                }
+
+                csvDataOut.NextRecord();
             }
         }
 

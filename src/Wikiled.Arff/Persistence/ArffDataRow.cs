@@ -46,6 +46,8 @@ namespace Wikiled.Arff.Persistence
             }
         }
 
+        public IDictionary<IHeader, DataRecord> HeadersTable => records;
+
         public IHeader[] Headers => records.Keys.ToArray();
 
         public int Id { get; }
