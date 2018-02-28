@@ -242,9 +242,9 @@ namespace Wikiled.Arff.Persistence
                         
                         csvDataOut.WriteField(value);
                     }
-                }
 
-                csvDataOut.NextRecord();
+                    csvDataOut.NextRecord();
+                }
             }
         }
 
