@@ -32,7 +32,7 @@ namespace Wikiled.Arff.Persistence
         {
             Guard.NotNull(() => header, header);
             Normalization = NormalizationType.None;
-            IsSparse = true;
+            isSparse = true;
             Header = header;
             Header.Removed += HeaderWordsRemoved;
             Header.Added += HeaderWordsOnAdded;

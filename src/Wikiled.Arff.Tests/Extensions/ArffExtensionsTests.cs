@@ -9,7 +9,7 @@ namespace Wikiled.Arff.Tests.Extensions
     [TestFixture]
     public class ArffExtensionsTests
     {
-		[Test]
+        [Test]
         public void RemoveClass()
         {
             var dataSet = ArffDataSet.CreateSimple("Test");
@@ -23,8 +23,8 @@ namespace Wikiled.Arff.Tests.Extensions
             dataSet.RemoveClass("Two");
             Assert.AreEqual(2, dataSet.Documents.Count());
             Assert.AreEqual("@RELATION Test\r\n@ATTRIBUTE class {One, Three}\r\n@DATA", dataSet.ToString());
-        }      
-		
+        }
+
         [Test]
         public async Task CompactHeader()
         {
@@ -45,6 +45,18 @@ namespace Wikiled.Arff.Tests.Extensions
             Assert.AreEqual(2, dataSet.Header.Total);
             Assert.AreEqual(10, dataSet.Documents.Count());
             Assert.AreEqual(10, dataSet.Header["One"].InDocuments);
+        }
+
+        [Test]
+        public void IsSparse()
+        {
+            var dataSet = ArffDataSet.CreateSimple("Test");
+            var header = dataSet.Header.RegisterNumericClass();
+            Assert.IsTrue(dataSet.IsSparse);
+            Assert.IsTrue(header.IsSparse);
+            dataSet.IsSparse = false;
+            Assert.IsFalse(dataSet.IsSparse);
+            Assert.IsFalse(header.IsSparse);
         }
 
         [Test]
