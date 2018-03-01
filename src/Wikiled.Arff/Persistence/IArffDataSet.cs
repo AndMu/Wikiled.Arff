@@ -17,6 +17,8 @@ namespace Wikiled.Arff.Persistence
 
         bool UseTotal { get; set; }
 
+        bool IsSparse { get; set; }
+
         void Save(string fileName);
 
         void Save(StreamWriter stream);

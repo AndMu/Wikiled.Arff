@@ -37,9 +37,7 @@ namespace Wikiled.Arff.Persistence.Headers
             if (string.IsNullOrEmpty(text))
             {
                 if (!string.IsNullOrEmpty(Name) &&
-                    Name.Contains(" ") ||
-                    Name.Contains("'") ||
-                    Name.Contains(","))
+                    (Name.Contains(" ") || Name.Contains("'") || Name.Contains(",")))
                 {
                     text = $"@ATTRIBUTE \"{Name}\" {GetAdditionalText()}";
                 }
@@ -47,7 +45,6 @@ namespace Wikiled.Arff.Persistence.Headers
                 {
                     text = $"@ATTRIBUTE {Name} {GetAdditionalText()}";
                 }
-                
             }
 
             return text;
@@ -84,8 +81,7 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public void Remove(int docId)
         {
-            int removed;
-            docs.TryRemove(docId, out removed);
+            docs.TryRemove(docId, out _);
         }
 
         protected abstract string GetAdditionalText();

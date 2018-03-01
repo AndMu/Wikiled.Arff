@@ -26,10 +26,13 @@ namespace Wikiled.Arff.Persistence
 
         private bool useTotal;
 
+        private bool isSparse;
+
         private ArffDataSet(IHeadersWordsHandling header, string name)
         {
             Guard.NotNull(() => header, header);
             Normalization = NormalizationType.None;
+            IsSparse = true;
             Header = header;
             Header.Removed += HeaderWordsRemoved;
             Header.Added += HeaderWordsOnAdded;
@@ -55,6 +58,20 @@ namespace Wikiled.Arff.Persistence
                 }
 
                 useTotal = value;
+            }
+        }
+
+        public bool IsSparse
+        {
+            get => isSparse;
+            set
+            {
+                foreach (NumericHeader header in Header.Where(item => item is NumericHeader))
+                {
+                    header.IsSparse = value;
+                }
+
+                isSparse = value;
             }
         }
 
@@ -331,7 +348,7 @@ namespace Wikiled.Arff.Persistence
 
                 var index = int.Parse(itemBlocks[0]);
                 var header = docHolder.Header.GetByIndex(index);
-                var wordItem = doc.Resolve(header);
+                var wordItem = doc.AddRecord(header);
                 wordItem.Value = header.Parse(itemBlocks.Skip(1).AccumulateItems(" "));
             }
         }
@@ -341,6 +358,7 @@ namespace Wikiled.Arff.Persistence
             if (headerEventArgs.Header is NumericHeader header)
             {
                 header.UseCount = UseTotal;
+                header.IsSparse = IsSparse;
             }
         }
 

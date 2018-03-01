@@ -19,7 +19,7 @@ namespace Wikiled.Arff.Persistence
 
         DataRecord this[string word] { get; }
 
-        DataRecord Resolve(IHeader header);
+        DataRecord AddRecord(IHeader header);
 
         DataRecord AddRecord(string word);
 

@@ -66,7 +66,7 @@ namespace Wikiled.Arff.Persistence
             }
         }
 
-        public DataRecord Resolve(IHeader header)
+        public DataRecord AddRecord(IHeader header)
         {
             IHeader existing = Owner.Header[header.Name];
             if (existing == null)
@@ -91,7 +91,7 @@ namespace Wikiled.Arff.Persistence
         public DataRecord AddRecord(string name)
         {
             IHeader header = GetHeader(name);
-            return header == null ? null : Resolve(header);
+            return header == null ? null : AddRecord(header);
         }
 
         public bool Contains(IHeader header)
@@ -139,7 +139,6 @@ namespace Wikiled.Arff.Persistence
         public override string ToString()
         {
             var line = new SparseInformationLine();
-
             var wordItems = records.Select(
                 item => new
                 {

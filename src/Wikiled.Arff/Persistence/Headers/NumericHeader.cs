@@ -15,6 +15,8 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public bool UseCount { get; set; }
 
+        public bool IsSparse { get; set; }
+
         public static bool CanCreate(string[] items)
         {
             return string.Compare(items[2], Tag, StringComparison.OrdinalIgnoreCase) == 0;
@@ -32,8 +34,7 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public override object Parse(string text)
         {
-            double result;
-            if (!double.TryParse(text, out result))
+            if (!double.TryParse(text, out var result))
             {
                 return null;
             }
@@ -64,18 +65,13 @@ namespace Wikiled.Arff.Persistence.Headers
 
         protected override string ReadValueInternal(DataRecord record)
         {
-            if (UseCount &&
-                record.Value == null)
+            if (UseCount && record.Value == null)
             {
-                return record.Total == 0 ? string.Empty : record.Total.ToString();
+                return record.Total == 0 && !IsSparse ? string.Empty : record.Total.ToString();
             }
 
             CheckSupport(record.Value);
-            if (record.Value == null ||
-                record.Value.Equals(0.0) ||
-                record.Value.Equals(0) ||
-                record.Value.Equals(0.0f) ||
-                record.Value.Equals(0.0d))
+            if (IsSparse && (record.Value == null || record.Value.Equals(0.0) || record.Value.Equals(0) || record.Value.Equals(0.0f) || record.Value.Equals(0.0d)))
             {
                 return string.Empty;
             }

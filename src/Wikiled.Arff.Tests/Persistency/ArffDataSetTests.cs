@@ -93,9 +93,9 @@ namespace Wikiled.Arff.Tests.Persistency
         {
             var header = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c" });
             var item = header.AddDocument();
-            var resolve = item.Resolve(new NumericHeader(0, "a"));
+            var resolve = item.AddRecord(new NumericHeader(0, "a"));
             resolve.Value = 3;
-            resolve = item.Resolve(new NumericHeader(0, "a"));
+            resolve = item.AddRecord(new NumericHeader(0, "a"));
             Assert.AreEqual(3, resolve.Value);
             Assert.AreEqual("{0 3,3 Neutral}", item.ToString());
         }
@@ -197,6 +197,7 @@ namespace Wikiled.Arff.Tests.Persistency
             item.AddRecord("b").Value = 30;
             item.AddRecord("c").Value = 30;
             item = docsDataHolder.AddDocument();
+            item.AddRecord("a").Value = 0;
             item.AddRecord("c").Value = 100;
             docsDataHolder.Normalize(NormalizationType.L2);
             Assert.AreEqual("{0 0.4472135955,1 0.894427191,3 Neutral}", first.ToString());
