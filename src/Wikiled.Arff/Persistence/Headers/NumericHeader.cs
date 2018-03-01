@@ -65,15 +65,22 @@ namespace Wikiled.Arff.Persistence.Headers
 
         protected override string ReadValueInternal(DataRecord record)
         {
+            var defaultValue = IsSparse ? string.Empty : "0";
+
             if (UseCount && record.Value == null)
             {
-                return record.Total == 0 && !IsSparse ? string.Empty : record.Total.ToString();
+                return record.Total == 0 ? defaultValue : record.Total.ToString();
             }
 
             CheckSupport(record.Value);
-            if (IsSparse && (record.Value == null || record.Value.Equals(0.0) || record.Value.Equals(0) || record.Value.Equals(0.0f) || record.Value.Equals(0.0d)))
+            if (record.Value == null)
             {
                 return string.Empty;
+            }
+
+            if (record.Value.Equals(0.0) || record.Value.Equals(0) || record.Value.Equals(0.0f) || record.Value.Equals(0.0d))
+            {
+                return defaultValue;
             }
 
             return record.Value.ToString();

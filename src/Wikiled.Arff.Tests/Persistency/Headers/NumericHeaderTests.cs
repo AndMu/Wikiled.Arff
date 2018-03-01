@@ -50,11 +50,31 @@ namespace Wikiled.Arff.Tests.Persistency.Headers
         [TestCase(0, false, "0")]
         [TestCase(1, true, "1")]
         [TestCase(1, false, "1")]
-        public void ReadValue(int value, bool isSparse, string expected)
+        [TestCase(null, true, "")]
+        [TestCase(null, false, "")]
+        public void ReadValue(int? value, bool isSparse, string expected)
         {
             DataRecord record = new DataRecord(header);
             record.Value = value;
             header.IsSparse = isSparse;
+            var result = header.ReadValue(record);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCase(0, true, "")]
+        [TestCase(0, false, "0")]
+        [TestCase(1, true, "1")]
+        [TestCase(1, false, "1")]
+        public void ReadCountValue(int value, bool isSparse, string expected)
+        {
+            DataRecord record = new DataRecord(header);
+            header.IsSparse = isSparse;
+            header.UseCount = true;
+            for (int i = 0; i < value; i++)
+            {
+                record.Increment();
+            }
+
             var result = header.ReadValue(record);
             Assert.AreEqual(expected, result);
         }
