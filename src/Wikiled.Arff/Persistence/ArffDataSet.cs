@@ -39,7 +39,21 @@ namespace Wikiled.Arff.Persistence
             this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
         }
 
-        public IEnumerable<IArffDataRow> Documents => from item in documents select item.Value;
+        public IEnumerable<IArffDataRow> Documents
+        {
+            get
+            {
+                var data = from item in documents select item.Value;
+                if (Random != null)
+                {
+                    data = data.Shuffle(Random);
+                }
+
+                return data;
+            }
+        }
+
+        public Random Random { get; set; }
 
         public IHeadersWordsHandling Header { get; }
 

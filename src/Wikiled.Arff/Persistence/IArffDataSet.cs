@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Wikiled.Arff.Normalization;
@@ -7,6 +8,8 @@ namespace Wikiled.Arff.Persistence
 {
     public interface IArffDataSet
     {
+        Random Random { get; set; }
+
         IHeadersWordsHandling Header { get; }
 
         NormalizationType Normalization { get; }
