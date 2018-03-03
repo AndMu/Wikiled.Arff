@@ -37,24 +37,23 @@ namespace Wikiled.Arff.Persistence
             Header.Removed += HeaderWordsRemoved;
             Header.Added += HeaderWordsOnAdded;
             this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
-            Random = new Random();
         }
 
         public IEnumerable<IArffDataRow> Documents
         {
             get
             {
-                var data = from item in documents select item.Value;
-                if (Random != null)
+                var data = from item in documents.OrderBy(item => item.Key) select item.Value;
+                if (RandomSeed != null)
                 {
-                    data = data.Shuffle(Random);
+                    data = data.Shuffle(new Random(RandomSeed.Value));
                 }
 
                 return data;
             }
         }
 
-        public Random Random { get; set; }
+        public int? RandomSeed { get; set; }
 
         public IHeadersWordsHandling Header { get; }
 
@@ -157,7 +156,6 @@ namespace Wikiled.Arff.Persistence
         {
             var builder = new StringBuilder();
             builder.AppendFormat("@RELATION {0}\r\n", name);
-
             foreach (var item in Header)
             {
                 builder.AppendFormat("{0}{1}", item, Environment.NewLine);
@@ -175,7 +173,7 @@ namespace Wikiled.Arff.Persistence
             }
 
             Interlocked.Increment(ref internalDocumentsOffset);
-            return GetDocument(internalDocumentsOffset);
+            return GetOrCreateDocument(internalDocumentsOffset);
         }
 
         public void Clear()
@@ -184,7 +182,7 @@ namespace Wikiled.Arff.Persistence
             documents.Clear();
         }
 
-        public IArffDataRow GetDocument(int documentId)
+        public IArffDataRow GetOrCreateDocument(int documentId)
         {
             IArffDataRow doc;
             if (!documents.TryGetValue(documentId, out doc))
@@ -230,7 +228,7 @@ namespace Wikiled.Arff.Persistence
 
         public void RemoveDocument(int documentId)
         {
-            var doc = GetDocument(documentId);
+            var doc = GetOrCreateDocument(documentId);
             if (doc != null)
             {
                 foreach (var headers in doc.Headers)

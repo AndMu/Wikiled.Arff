@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Wikiled.Arff.Extensions;
@@ -99,6 +101,23 @@ namespace Wikiled.Arff.Tests.Extensions
             review.Class.Value = "Two";
             dataSet.CompactClass(1);
             Assert.AreEqual(2, dataSet.Documents.Count());
+        }
+
+        [Test]
+        public void CopyDataSet()
+        {
+            var dataSet = ArffDataSet.LoadSimple(Path.Combine(TestContext.CurrentContext.TestDirectory, "Data", @"problem.arff"));
+            dataSet.RandomSeed = 28;
+            var copy = dataSet.CopyDataSet("Test");
+
+            dataSet.RandomSeed = 31;
+            copy.RandomSeed = 31;
+            var orgininalDocs = dataSet.Documents.ToArray();
+            var resultDocs = copy.Documents.ToArray();
+            for (int i = 0; i < dataSet.TotalDocuments; i++)
+            {
+                Assert.AreEqual(resultDocs[i].Class.Value, orgininalDocs[i].Class.Value);
+            }
         }
     }
 }

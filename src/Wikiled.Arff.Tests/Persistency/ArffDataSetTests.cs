@@ -182,7 +182,7 @@ namespace Wikiled.Arff.Tests.Persistency
         public void Normalize()
         {
             var docsDataHolder = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c" });
-            docsDataHolder.Random = null;
+            docsDataHolder.RandomSeed = null;
             var item = docsDataHolder.AddDocument();
             var first = item;
             item.AddRecord("a").Value = 2;
@@ -295,13 +295,13 @@ namespace Wikiled.Arff.Tests.Persistency
         public void Createdoc()
         {
             var header = ArffDataSet.CreateDataRecord<StarType>(new[] { "1", "2", "3" });
-            header.Random = null;
+            header.RandomSeed = null;
             Assert.AreEqual(0, header.TotalDocuments);
-            header.GetDocument(1);
+            header.GetOrCreateDocument(1);
             Assert.AreEqual(1, header.TotalDocuments);
-            header.GetDocument(2);
+            header.GetOrCreateDocument(2);
             Assert.AreEqual(2, header.TotalDocuments);
-            header.GetDocument(2);
+            header.GetOrCreateDocument(2);
             Assert.AreEqual(2, header.TotalDocuments);
             Assert.AreEqual(2, header.Documents.Count());
             var document = header.Documents.First();
@@ -313,13 +313,13 @@ namespace Wikiled.Arff.Tests.Persistency
         public void Save()
         {
             var header = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "1", "2", "3" });
-            header.Random = null;
+            header.RandomSeed = null;
             header.UseTotal = true;
-            var doc = header.GetDocument(1);
+            var doc = header.GetOrCreateDocument(1);
             doc.AddRecord("1");
             doc.AddRecord("2");
             doc.Class.Value = PositivityType.Positive;
-            doc = header.GetDocument(2);
+            doc = header.GetOrCreateDocument(2);
             doc.AddRecord("2");
             doc.AddRecord("3");
             doc.Class.Value = PositivityType.Negative;

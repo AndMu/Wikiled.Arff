@@ -13,6 +13,39 @@ namespace Wikiled.Arff.Extensions
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
+        public static IArffDataSet CreateDataSet(this IArffDataSet baseDataSet, string name)
+        {
+            var result = ArffDataSet.CreateFixed((IHeadersWordsHandling)baseDataSet.Header.Clone(), name);
+            result.RandomSeed = baseDataSet.RandomSeed;
+            return result;
+        }
+
+        public static IArffDataSet CopyDataSet(this IArffDataSet baseDataSet, string name)
+        {
+            var dataSet = baseDataSet.CreateDataSet(name);
+            var random = baseDataSet.RandomSeed;
+            baseDataSet.RandomSeed = null;
+            foreach (var review in baseDataSet.Documents)
+            {
+                var newReview = dataSet.GetOrCreateDocument(review.Id);
+                foreach (var word in review.GetRecords())
+                {
+                    var addedWord = newReview.AddRecord(word.Header);
+                    if (addedWord == null)
+                    {
+                        continue;
+                    }
+
+                    addedWord.Value = word.Value;
+                }
+
+                newReview.Class.Value = review.Class.Value;
+            }
+
+            baseDataSet.RandomSeed = random;
+            return baseDataSet;
+        }
+
         public static void CompactClass(this IArffDataSet dataSet, int minimum)
         {
             Guard.NotNull(() => dataSet, dataSet);

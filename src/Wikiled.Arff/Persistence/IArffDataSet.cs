@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using Wikiled.Arff.Normalization;
@@ -8,7 +7,7 @@ namespace Wikiled.Arff.Persistence
 {
     public interface IArffDataSet
     {
-        Random Random { get; set; }
+        int? RandomSeed { get; set; }
 
         IHeadersWordsHandling Header { get; }
 
@@ -28,7 +27,7 @@ namespace Wikiled.Arff.Persistence
 
         IArffDataRow AddDocument();
 
-        IArffDataRow GetDocument(int documentId);
+        IArffDataRow GetOrCreateDocument(int documentId);
 
         void Normalize(NormalizationType type);
 
