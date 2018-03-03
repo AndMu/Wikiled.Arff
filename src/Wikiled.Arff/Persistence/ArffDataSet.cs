@@ -37,6 +37,7 @@ namespace Wikiled.Arff.Persistence
             Header.Removed += HeaderWordsRemoved;
             Header.Added += HeaderWordsOnAdded;
             this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
+            Random = new Random();
         }
 
         public IEnumerable<IArffDataRow> Documents
