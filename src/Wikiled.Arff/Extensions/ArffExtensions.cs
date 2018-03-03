@@ -15,17 +15,18 @@ namespace Wikiled.Arff.Extensions
 
         public static IArffDataSet CreateDataSet(this IArffDataSet baseDataSet, string name)
         {
+            Guard.NotNull(() => baseDataSet, baseDataSet);
             var result = ArffDataSet.CreateFixed((IHeadersWordsHandling)baseDataSet.Header.Clone(), name);
             result.RandomSeed = baseDataSet.RandomSeed;
             return result;
         }
 
-        public static IArffDataSet CopyDataSet(this IArffDataSet baseDataSet, string name)
+        public static IArffDataSet CopyDataSet(this IArffDataSet dataSetSource, IHeadersWordsHandling headers, string name)
         {
-            var dataSet = baseDataSet.CreateDataSet(name);
-            var random = baseDataSet.RandomSeed;
-            baseDataSet.RandomSeed = null;
-            foreach (var review in baseDataSet.Documents)
+            Guard.NotNull(() => dataSetSource, dataSetSource);
+            Guard.NotNull(() => headers, headers);
+            var dataSet = ArffDataSet.CreateFixed((IHeadersWordsHandling)headers.Clone(), name);
+            foreach (var review in dataSetSource.Documents)
             {
                 var newReview = dataSet.GetOrCreateDocument(review.Id);
                 foreach (var word in review.GetRecords())
@@ -42,8 +43,8 @@ namespace Wikiled.Arff.Extensions
                 newReview.Class.Value = review.Class.Value;
             }
 
-            baseDataSet.RandomSeed = random;
-            return baseDataSet;
+            dataSet.RandomSeed = dataSetSource.RandomSeed;
+            return dataSet;
         }
 
         public static void CompactClass(this IArffDataSet dataSet, int minimum)
