@@ -17,7 +17,6 @@ namespace Wikiled.Arff.Extensions
         {
             Guard.NotNull(() => baseDataSet, baseDataSet);
             var result = ArffDataSet.CreateFixed((IHeadersWordsHandling)baseDataSet.Header.Clone(), name);
-            result.RandomSeed = baseDataSet.RandomSeed;
             return result;
         }
 
@@ -43,7 +42,6 @@ namespace Wikiled.Arff.Extensions
                 newReview.Class.Value = review.Class.Value;
             }
 
-            dataSet.RandomSeed = dataSetSource.RandomSeed;
             return dataSet;
         }
 

@@ -107,11 +107,7 @@ namespace Wikiled.Arff.Tests.Extensions
         public void CopyDataSet()
         {
             var dataSet = ArffDataSet.LoadSimple(Path.Combine(TestContext.CurrentContext.TestDirectory, "Data", @"problem.arff"));
-            dataSet.RandomSeed = 28;
             var copy = dataSet.CopyDataSet(dataSet.Header, "Test");
-
-            dataSet.RandomSeed = 31;
-            copy.RandomSeed = 31;
             var orgininalDocs = dataSet.Documents.ToArray();
             var resultDocs = copy.Documents.ToArray();
             for (int i = 0; i < dataSet.TotalDocuments; i++)

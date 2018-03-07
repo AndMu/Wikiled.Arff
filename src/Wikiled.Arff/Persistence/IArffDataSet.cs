@@ -7,7 +7,7 @@ namespace Wikiled.Arff.Persistence
 {
     public interface IArffDataSet
     {
-        int? RandomSeed { get; set; }
+        bool IsRandom { get; set; }
 
         IHeadersWordsHandling Header { get; }
 

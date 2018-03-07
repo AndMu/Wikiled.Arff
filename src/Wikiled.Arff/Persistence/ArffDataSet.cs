@@ -11,6 +11,7 @@ using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence.Headers;
 using Wikiled.Common.Arguments;
 using Wikiled.Common.Extensions;
+using Wikiled.Common.Helpers;
 
 namespace Wikiled.Arff.Persistence
 {
@@ -44,16 +45,16 @@ namespace Wikiled.Arff.Persistence
             get
             {
                 var data = from item in documents.OrderBy(item => item.Key) select item.Value;
-                if (RandomSeed != null)
+                if (IsRandom)
                 {
-                    data = data.Shuffle(new Random(RandomSeed.Value));
+                    data = data.Shuffle(new Random(RandomHelper.Seed));
                 }
 
                 return data;
             }
         }
 
-        public int? RandomSeed { get; set; }
+        public bool IsRandom { get; set; }
 
         public IHeadersWordsHandling Header { get; }
 
