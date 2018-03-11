@@ -11,6 +11,7 @@ using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence.Headers;
 using Wikiled.Common.Arguments;
 using Wikiled.Common.Extensions;
+using Wikiled.Common.Helpers;
 
 namespace Wikiled.Arff.Persistence
 {
