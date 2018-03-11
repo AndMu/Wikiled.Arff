@@ -182,7 +182,6 @@ namespace Wikiled.Arff.Tests.Persistency
         public void Normalize()
         {
             var docsDataHolder = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c" });
-            docsDataHolder.RandomSeed = null;
             var item = docsDataHolder.AddDocument();
             var first = item;
             item.AddRecord("a").Value = 2;
@@ -295,7 +294,6 @@ namespace Wikiled.Arff.Tests.Persistency
         public void Createdoc()
         {
             var header = ArffDataSet.CreateDataRecord<StarType>(new[] { "1", "2", "3" });
-            header.RandomSeed = null;
             Assert.AreEqual(0, header.TotalDocuments);
             header.GetOrCreateDocument(1);
             Assert.AreEqual(1, header.TotalDocuments);
@@ -313,7 +311,6 @@ namespace Wikiled.Arff.Tests.Persistency
         public void Save()
         {
             var header = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "1", "2", "3" });
-            header.RandomSeed = null;
             header.UseTotal = true;
             var doc = header.GetOrCreateDocument(1);
             doc.AddRecord("1");

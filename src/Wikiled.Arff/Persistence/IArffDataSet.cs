@@ -7,8 +7,6 @@ namespace Wikiled.Arff.Persistence
 {
     public interface IArffDataSet
     {
-        int? RandomSeed { get; set; }
-
         IHeadersWordsHandling Header { get; }
 
         NormalizationType Normalization { get; }

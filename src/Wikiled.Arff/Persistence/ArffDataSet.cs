@@ -43,17 +43,9 @@ namespace Wikiled.Arff.Persistence
         {
             get
             {
-                var data = from item in documents.OrderBy(item => item.Key) select item.Value;
-                if (RandomSeed != null)
-                {
-                    data = data.Shuffle(new Random(RandomSeed.Value));
-                }
-
-                return data;
+                return from item in documents.OrderBy(item => item.Key) select item.Value;
             }
         }
-
-        public int? RandomSeed { get; set; }
 
         public IHeadersWordsHandling Header { get; }
 
