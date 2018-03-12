@@ -28,12 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="C:\1\data.arff" Link="Data\data.arff">
+    <None Update="Data\data.arff">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Data\problem.arff">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
