@@ -18,7 +18,7 @@ namespace Wikiled.Arff.Persistence
 
         public static double[] GetX(this IArffDataRow row)
         {
-            double[] x = new double[row.Headers.Length];
+            double[] x = new double[row.Owner.Header.Total];
             for (int i = 0; i < x.Length; i++)
             {
                 x[i] = 0;

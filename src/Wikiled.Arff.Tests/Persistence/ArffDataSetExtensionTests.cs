@@ -15,5 +15,13 @@ namespace Wikiled.Arff.Tests.Persistence
             var data = dataSet.GetData().ToArray();
             Assert.AreEqual(9371, data.Length);
         }
+
+        [Test]
+        public void GetData2()
+        {
+            var dataSet = ArffDataSet.LoadSimple(Path.Combine(TestContext.CurrentContext.TestDirectory, "Data", @"Data.arff"));
+            var data = dataSet.GetData().ToArray();
+            Assert.AreEqual(7215, data.Length);
+        }
     }
 }
