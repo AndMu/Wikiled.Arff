@@ -7,11 +7,9 @@ using System.Text;
 using System.Threading;
 using CsvHelper;
 using NLog;
-using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence.Headers;
 using Wikiled.Common.Arguments;
 using Wikiled.Common.Extensions;
-using Wikiled.Common.Helpers;
 
 namespace Wikiled.Arff.Persistence
 {
@@ -32,7 +30,6 @@ namespace Wikiled.Arff.Persistence
         private ArffDataSet(IHeadersWordsHandling header, string name)
         {
             Guard.NotNull(() => header, header);
-            Normalization = NormalizationType.None;
             isSparse = true;
             Header = header;
             Header.Removed += HeaderWordsRemoved;
@@ -49,8 +46,6 @@ namespace Wikiled.Arff.Persistence
         }
 
         public IHeadersWordsHandling Header { get; }
-
-        public NormalizationType Normalization { get; private set; }
 
         public int TotalDocuments => documents.Count;
 
@@ -160,18 +155,12 @@ namespace Wikiled.Arff.Persistence
 
         public IArffDataRow AddDocument()
         {
-            if (Normalization != NormalizationType.None)
-            {
-                throw new ArgumentException("Can't add new document to normalized dataset");
-            }
-
             Interlocked.Increment(ref internalDocumentsOffset);
             return GetOrCreateDocument(internalDocumentsOffset);
         }
 
         public void Clear()
         {
-            Normalization = NormalizationType.None;
             documents.Clear();
         }
 
@@ -185,38 +174,6 @@ namespace Wikiled.Arff.Persistence
             }
 
             return doc;
-        }
-
-        public void Normalize(NormalizationType type)
-        {
-            if (Normalization != NormalizationType.None)
-            {
-                throw new ArgumentOutOfRangeException("type", "Data is already normalized");
-            }
-
-            if (type == NormalizationType.None)
-            {
-                return;
-            }
-
-            Normalization = type;
-            foreach (var doc in Documents)
-            {
-                var words = doc.GetRecords()
-                               .Where(item => item.Header is NumericHeader)
-                               .ToArray();
-
-                var normalized = words
-                                 .Select(item => Convert.ToDouble(item.Value))
-                                 .Normalize(type)
-                                 .GetNormalized
-                                 .ToArray();
-
-                for (var i = 0; i < words.Length; i++)
-                {
-                    words[i].Value = normalized[i];
-                }
-            }
         }
 
         public void RemoveDocument(int documentId)

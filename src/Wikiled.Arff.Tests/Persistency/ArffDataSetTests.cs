@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
 
@@ -176,31 +175,6 @@ namespace Wikiled.Arff.Tests.Persistency
             docsDataHolder.Header.RegisterNominal("a", new[] { "1", "2" });
             var record = item.AddRecord("a");
             Assert.Throws<InvalidDataException>(() => record.Value = "3");
-        }
-
-        [Test]
-        public void Normalize()
-        {
-            var docsDataHolder = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c" });
-            var item = docsDataHolder.AddDocument();
-            var first = item;
-            item.AddRecord("a").Value = 2;
-            item.AddRecord("b").Value = 4;
-            item = docsDataHolder.AddDocument();
-            item.AddRecord("a").Value = 20;
-            item.AddRecord("b").Value = 40;
-            item = docsDataHolder.AddDocument();
-            item.AddRecord("a").Value = 30;
-            item.AddRecord("c").Value = 60;
-            item = docsDataHolder.AddDocument();
-            item.AddRecord("a").Value = 30;
-            item.AddRecord("b").Value = 30;
-            item.AddRecord("c").Value = 30;
-            item = docsDataHolder.AddDocument();
-            item.AddRecord("a").Value = 0;
-            item.AddRecord("c").Value = 100;
-            docsDataHolder.Normalize(NormalizationType.L2);
-            Assert.AreEqual("{0 0.4472135955,1 0.894427191,3 Neutral}", first.ToString());
         }
 
         [Test]

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using Wikiled.Arff.Normalization;
 using Wikiled.Arff.Persistence.Headers;
 
 namespace Wikiled.Arff.Persistence
@@ -8,8 +7,6 @@ namespace Wikiled.Arff.Persistence
     public interface IArffDataSet
     {
         IHeadersWordsHandling Header { get; }
-
-        NormalizationType Normalization { get; }
 
         IEnumerable<IArffDataRow> Documents { get; }
 
@@ -26,8 +23,6 @@ namespace Wikiled.Arff.Persistence
         IArffDataRow AddDocument();
 
         IArffDataRow GetOrCreateDocument(int documentId);
-
-        void Normalize(NormalizationType type);
 
         void Clear();
 
