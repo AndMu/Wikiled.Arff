@@ -9,7 +9,17 @@ namespace Wikiled.Arff.Persistence
     {
         public static IEnumerable<(int? Y, double[] X)> GetData(this IArffDataSet dataSet)
         {
-            var headers = dataSet.Header.Where(item => dataSet.Header.Class != item && !(item is DateHeader));
+            var table = GetFeatureTable(dataSet);
+            foreach (var dataRow in dataSet.Documents)
+            {
+                var y = dataSet.Header.Class?.ReadClassIdValue(dataRow.Class);
+                yield return (y, dataRow.GetX(table));
+            }
+        }
+
+        public static Dictionary<IHeader, int> GetFeatureTable(this IArffDataSet dataSet)
+        {
+            var headers = dataSet.Header.Where(item => dataSet.Header.Class != item && !(item is DateHeader)).OrderBy(item => dataSet.Header.GetIndex(item));
             var table = new Dictionary<IHeader, int>();
             int index = 0;
             foreach (var header in headers)
@@ -18,11 +28,7 @@ namespace Wikiled.Arff.Persistence
                 index++;
             }
 
-            foreach (var dataRow in dataSet.Documents)
-            {
-                var y = dataSet.Header.Class?.ReadClassIdValue(dataRow.Class);
-                yield return (y, dataRow.GetX(table));
-            }
+            return table;
         }
 
         private static double[] GetX(this IArffDataRow row, Dictionary<IHeader, int> headers)
