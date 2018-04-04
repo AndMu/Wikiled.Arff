@@ -4,19 +4,19 @@ using NUnit.Framework;
 using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
 
-namespace Wikiled.Arff.Tests.Persistency.Headers
+namespace Wikiled.Arff.Tests.Persistence.Headers
 {
     [TestFixture]
-    public class EnumNominalHeaderTests
+    public class NominalHeaderTests
     {
-        private EnumNominalHeader header;
+        private NominalHeader header;
 
         private DataRecord record;
 
         [SetUp]
         public void Setup()
         {
-            header = new EnumNominalHeader(1, "Test", typeof(PositivityType));
+            header = new NominalHeader(1, "Test", new[] { "one", "two" });
             record = new DataRecord(header);
         }
 
@@ -24,14 +24,13 @@ namespace Wikiled.Arff.Tests.Persistency.Headers
         public void Test()
         {
             Assert.AreEqual("Test", header.Name);
-            Assert.AreEqual("@ATTRIBUTE Test {Negative, Neutral, Positive}", header.ToString());
+            Assert.AreEqual("@ATTRIBUTE Test {one, two}", header.ToString());
             Assert.AreEqual(1, header.Index);
         }
 
-        [TestCase(PositivityType.Negative, -1)]
-        [TestCase(PositivityType.Neutral, 0)]
-        [TestCase(PositivityType.Positive, 1)]
-        public void ReadClassIdValue(PositivityType value, int expected)
+        [TestCase("one", 0)]
+        [TestCase("two", 1)]
+        public void ReadClassIdValue(string value, int expected)
         {
             Assert.Throws<ArgumentNullException>(() => header.ReadClassIdValue(null));
             record.Value = value;
@@ -39,10 +38,9 @@ namespace Wikiled.Arff.Tests.Persistency.Headers
             Assert.AreEqual(expected, result);
         }
 
-        [TestCase(0, PositivityType.Neutral)]
-        [TestCase(1, PositivityType.Positive)]
-        [TestCase(-1, PositivityType.Negative)]
-        public void GetValueByClassId(int value, PositivityType expected)
+        [TestCase(0, "one")]
+        [TestCase(1, "two")]
+        public void GetValueByClassId(int value, string expected)
         {
             var result = header.GetValueByClassId(value);
             Assert.AreEqual(expected, result);
@@ -51,7 +49,7 @@ namespace Wikiled.Arff.Tests.Persistency.Headers
         [Test]
         public void CheckSupport()
         {
-            header.CheckSupport(PositivityType.Neutral);
+            header.CheckSupport("one");
             Assert.Throws<InvalidDataException>(() => header.CheckSupport("test"));
         }
 
@@ -60,7 +58,7 @@ namespace Wikiled.Arff.Tests.Persistency.Headers
         {
             var result = header.Clone();
             Assert.AreNotSame(result, header);
-            Assert.IsInstanceOf<EnumNominalHeader>(result);
+            Assert.IsInstanceOf<NominalHeader>(result);
         }
     }
 }

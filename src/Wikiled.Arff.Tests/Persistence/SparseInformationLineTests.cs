@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Wikiled.Arff.Persistence;
 
-namespace Wikiled.Arff.Tests.Persistency
+namespace Wikiled.Arff.Tests.Persistence
 {
     [TestFixture]
     public class SparseInformationLineTests

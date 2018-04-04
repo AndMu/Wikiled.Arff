@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
 
-namespace Wikiled.Arff.Tests.Persistency.Headers
+namespace Wikiled.Arff.Tests.Persistence.Headers
 {
     [TestFixture]
     public class NumericHeaderTests

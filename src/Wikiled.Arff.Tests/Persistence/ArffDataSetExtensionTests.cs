@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using Wikiled.Arff.Extensions;
 using Wikiled.Arff.Persistence;
 
 namespace Wikiled.Arff.Tests.Persistence

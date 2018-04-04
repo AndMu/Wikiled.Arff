@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
 
-namespace Wikiled.Arff.Tests.Persistency
+namespace Wikiled.Arff.Tests.Persistence
 {
     [TestFixture]
     public class ArffDataHolderTests

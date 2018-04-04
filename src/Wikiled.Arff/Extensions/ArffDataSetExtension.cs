@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
 
-namespace Wikiled.Arff.Persistence
+namespace Wikiled.Arff.Extensions
 {
     public static class ArffDataSetExtension
     {

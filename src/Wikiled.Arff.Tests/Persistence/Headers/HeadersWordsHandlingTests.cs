@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Wikiled.Arff.Persistence.Headers;
 
-namespace Wikiled.Arff.Tests.Persistency.Headers
+namespace Wikiled.Arff.Tests.Persistence.Headers
 {
     [TestFixture]
     public class HeadersWordsHandlingTests
