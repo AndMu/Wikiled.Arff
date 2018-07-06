@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using Wikiled.Common.Arguments;
 
 namespace Wikiled.Arff.Persistence.Headers
 {
@@ -10,7 +9,11 @@ namespace Wikiled.Arff.Persistence.Headers
         public NominalHeader(int index, string name, string[] nominalValues)
             : base(index, name)
         {
-            Guard.NotEmpty(() => nominalValues, nominalValues);
+            if (nominalValues.Length == 0)
+            {
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(nominalValues));
+            }
+
             Nominals = nominalValues;
         }
 
@@ -23,7 +26,11 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public virtual int ReadClassIdValue(DataRecord record)
         {
-            Guard.NotNull(() => record, record);
+            if (record == null)
+            {
+                throw new ArgumentNullException(nameof(record));
+            }
+
             return Array.IndexOf(Nominals, (string)record.Value);
         }
 

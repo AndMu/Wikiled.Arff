@@ -1,5 +1,4 @@
 using Wikiled.Arff.Persistence.Headers;
-using Wikiled.Common.Arguments;
 
 namespace Wikiled.Arff.Persistence
 {
@@ -9,8 +8,7 @@ namespace Wikiled.Arff.Persistence
 
         public DataRecord(IHeader header)
         {
-            Guard.NotNull(() => header, header);
-            Header = header;
+            Header = header ?? throw new System.ArgumentNullException(nameof(header));
         }
 
         public IHeader Header { get; }

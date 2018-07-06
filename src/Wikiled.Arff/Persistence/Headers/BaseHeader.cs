@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
-using Wikiled.Common.Arguments;
 
 namespace Wikiled.Arff.Persistence.Headers
 {
@@ -13,7 +12,11 @@ namespace Wikiled.Arff.Persistence.Headers
 
         protected BaseHeader(int index, string name)
         {
-            Guard.NotNullOrEmpty(() => name, name);
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Value cannot be null or empty.", nameof(name));
+            }
+
             Name = string.Intern(name);
             Index = index;
         }
@@ -70,10 +73,14 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public string ReadValue(DataRecord record)
         {
-            Guard.NotNull(() => record, record);
+            if (record == null)
+            {
+                throw new ArgumentNullException(nameof(record));
+            }
+
             if (record.Header != this)
             {
-                throw new ArgumentOutOfRangeException("record", "Invalid record");
+                throw new ArgumentOutOfRangeException(nameof(record), "Invalid record");
             }
 
             return ReadValueInternal(record);

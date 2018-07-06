@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using NLog;
 using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
-using Wikiled.Common.Arguments;
 
 namespace Wikiled.Arff.Extensions
 {
@@ -15,15 +14,27 @@ namespace Wikiled.Arff.Extensions
 
         public static IArffDataSet CreateDataSet(this IArffDataSet baseDataSet, string name)
         {
-            Guard.NotNull(() => baseDataSet, baseDataSet);
+            if (baseDataSet == null)
+            {
+                throw new ArgumentNullException(nameof(baseDataSet));
+            }
+
             var result = ArffDataSet.CreateFixed((IHeadersWordsHandling)baseDataSet.Header.Clone(), name);
             return result;
         }
 
         public static IArffDataSet CopyDataSet(this IArffDataSet dataSetSource, IHeadersWordsHandling headers, string name)
         {
-            Guard.NotNull(() => dataSetSource, dataSetSource);
-            Guard.NotNull(() => headers, headers);
+            if (dataSetSource == null)
+            {
+                throw new ArgumentNullException(nameof(dataSetSource));
+            }
+
+            if (headers == null)
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
             var dataSet = ArffDataSet.CreateFixed((IHeadersWordsHandling)headers.Clone(), name);
             foreach (var review in dataSetSource.Documents)
             {
@@ -47,7 +58,11 @@ namespace Wikiled.Arff.Extensions
 
         public static void CompactClass(this IArffDataSet dataSet, int minimum)
         {
-            Guard.NotNull(() => dataSet, dataSet);
+            if (dataSet == null)
+            {
+                throw new ArgumentNullException(nameof(dataSet));
+            }
+
             log.Debug("CompactClass: {0}", minimum);
             if (!(dataSet.Header.Class is NominalHeader classItem))
             {
@@ -66,12 +81,20 @@ namespace Wikiled.Arff.Extensions
 
         public static void RemoveClass(this IArffDataSet dataSet, string name)
         {
-            Guard.NotNull(() => dataSet, dataSet);
             log.Debug("RemoveClass: {0}", name);
-            Guard.NotNullOrEmpty(() => name, name);
             if (!(dataSet.Header.Class is NominalHeader classItem))
             {
                 throw new InvalidOperationException("Class not supported");
+            }
+
+            if (dataSet == null)
+            {
+                throw new ArgumentNullException(nameof(dataSet));
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Value cannot be null or empty.", nameof(name));
             }
 
             var reviews = dataSet.Documents.ToArray();
@@ -88,7 +111,11 @@ namespace Wikiled.Arff.Extensions
 
         public static async Task CompactHeader(this IArffDataSet dataSet, int minOccurences)
         {
-            Guard.NotNull(() => dataSet, dataSet);
+            if (dataSet == null)
+            {
+                throw new ArgumentNullException(nameof(dataSet));
+            }
+
             log.Debug("CompactHeader: {0}", minOccurences);
             List<Task> tasks = new List<Task>();
             foreach (var header in dataSet.Header.ToArray())
@@ -110,7 +137,11 @@ namespace Wikiled.Arff.Extensions
 
         public static void CompactReviews(this IArffDataSet dataSet, int minReviewSize)
         {
-            Guard.NotNull(() => dataSet, dataSet);
+            if (dataSet == null)
+            {
+                throw new ArgumentNullException(nameof(dataSet));
+            }
+
             log.Debug("CompactReviews: {0}", minReviewSize);
             foreach (var review in dataSet.Documents.ToArray())
             {

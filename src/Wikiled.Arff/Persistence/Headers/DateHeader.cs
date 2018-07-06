@@ -22,8 +22,7 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public override object Parse(string text)
         {
-            DateTime date;
-            if (!DateTime.TryParseExact(text, Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            if (!DateTime.TryParseExact(text, Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
             {
                 return null;
             }

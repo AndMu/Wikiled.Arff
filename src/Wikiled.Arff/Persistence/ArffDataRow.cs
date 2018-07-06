@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Wikiled.Arff.Persistence.Headers;
-using Wikiled.Common.Arguments;
 
 namespace Wikiled.Arff.Persistence
 {
@@ -16,8 +15,7 @@ namespace Wikiled.Arff.Persistence
         internal ArffDataRow(int docId, IArffDataSet dataSet)
         {
             Id = docId;
-            Guard.NotNull(() => dataSet, dataSet);
-            Owner = dataSet;
+            Owner = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
             if (dataSet.Header.Class != null)
             {
                 classRecord = new DataRecord(dataSet.Header.Class);
@@ -111,7 +109,11 @@ namespace Wikiled.Arff.Persistence
 
         public DataRecord SetRecord(DataRecord oldRecord)
         {
-            Guard.NotNull(() => oldRecord, oldRecord);
+            if (oldRecord == null)
+            {
+                throw new ArgumentNullException(nameof(oldRecord));
+            }
+
             IHeader header = Owner.Header[oldRecord.Header.Name] ?? Owner.Header.RegisterHeader(oldRecord.Header);
             DataRecord value = GetCreateRecord(header);
             value.Total = oldRecord.Total;
@@ -124,8 +126,7 @@ namespace Wikiled.Arff.Persistence
             for (int i = 0; i < Owner.Header.Total; i++)
             {
                 IHeader header = Owner.Header.GetByIndex(i);
-                DataRecord record;
-                if (records.TryGetValue(header, out record))
+                if (records.TryGetValue(header, out DataRecord record))
                 {
                     yield return record;
                 }
@@ -174,8 +175,7 @@ namespace Wikiled.Arff.Persistence
 
         private DataRecord GetCreateRecord(IHeader header)
         {
-            DataRecord data;
-            if (records.TryGetValue(header, out data))
+            if (records.TryGetValue(header, out DataRecord data))
             {
                 return data;
             }
@@ -192,8 +192,12 @@ namespace Wikiled.Arff.Persistence
 
         private IHeader GetHeader(string word)
         {
+            if (string.IsNullOrEmpty(word))
+            {
+                throw new ArgumentException("message", nameof(word));
+            }
+
             word = HeadersWordsHandling.GetRegularWord(word);
-            Guard.NotNull(() => word, word);
             IHeader header = Owner.Header[word];
             if (header == null &&
                 Owner.Header.CreateHeader)

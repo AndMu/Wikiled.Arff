@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Wikiled.Common.Arguments;
 using Wikiled.Common.Extensions;
 
 namespace Wikiled.Arff.Persistence.Headers
@@ -162,8 +161,7 @@ namespace Wikiled.Arff.Persistence.Headers
                 name = items[1].Trim();
             }
 
-            IHeader header;
-            if (headerTable.TryGetValue(name, out header))
+            if (headerTable.TryGetValue(name, out IHeader header))
             {
                 if (header != Class)
                 {
@@ -350,7 +348,11 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public void Remove(IHeader header)
         {
-            Guard.NotNull(() => header, header);
+            if (header == null)
+            {
+                throw new ArgumentNullException(nameof(header));
+            }
+
             try
             {
                 syncSlim.EnterWriteLock();
@@ -411,8 +413,7 @@ namespace Wikiled.Arff.Persistence.Headers
                 return create(name);
             }
 
-            IHeader header;
-            if (headerTable.TryGetValue(name, out header))
+            if (headerTable.TryGetValue(name, out IHeader header))
             {
                 return (T)header;
             }

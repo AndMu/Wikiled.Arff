@@ -8,7 +8,6 @@ using System.Threading;
 using CsvHelper;
 using NLog;
 using Wikiled.Arff.Persistence.Headers;
-using Wikiled.Common.Arguments;
 using Wikiled.Common.Extensions;
 
 namespace Wikiled.Arff.Persistence
@@ -29,9 +28,8 @@ namespace Wikiled.Arff.Persistence
 
         private ArffDataSet(IHeadersWordsHandling header, string name)
         {
-            Guard.NotNull(() => header, header);
             isSparse = true;
-            Header = header;
+            Header = header ?? throw new ArgumentNullException(nameof(header));
             Header.Removed += HeaderWordsRemoved;
             Header.Added += HeaderWordsOnAdded;
             this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
@@ -112,7 +110,11 @@ namespace Wikiled.Arff.Persistence
 
         public static IArffDataSet Load<T>(string fileName)
         {
-            Guard.NotNullOrEmpty(() => fileName, fileName);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentException("Value cannot be null or empty.", nameof(fileName));
+            }
+
             using (var reader = new StreamReader(fileName))
             {
                 return Load<T>(reader);
@@ -121,13 +123,21 @@ namespace Wikiled.Arff.Persistence
 
         public static IArffDataSet Load<T>(StreamReader streamReader)
         {
-            Guard.NotNull(() => streamReader, streamReader);
+            if (streamReader == null)
+            {
+                throw new ArgumentNullException(nameof(streamReader));
+            }
+
             return LoadInternal(streamReader, Create<T>);
         }
 
         public static IArffDataSet LoadSimple(string fileName)
         {
-            Guard.NotNullOrEmpty(() => fileName, fileName);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentException("Value cannot be null or empty.", nameof(fileName));
+            }
+
             using (var reader = new StreamReader(fileName))
             {
                 return LoadSimple(reader);
@@ -136,7 +146,11 @@ namespace Wikiled.Arff.Persistence
 
         public static IArffDataSet LoadSimple(StreamReader streamReader)
         {
-            Guard.NotNull(() => streamReader, streamReader);
+            if (streamReader == null)
+            {
+                throw new ArgumentNullException(nameof(streamReader));
+            }
+
             return LoadInternal(streamReader, CreateSimple);
         }
 
@@ -166,8 +180,7 @@ namespace Wikiled.Arff.Persistence
 
         public IArffDataRow GetOrCreateDocument(int documentId)
         {
-            IArffDataRow doc;
-            if (!documents.TryGetValue(documentId, out doc))
+            if (!documents.TryGetValue(documentId, out IArffDataRow doc))
             {
                 doc = new ArffDataRow(documentId, this);
                 documents[documentId] = doc;

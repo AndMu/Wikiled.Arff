@@ -1,5 +1,4 @@
 ﻿using System;
-using Wikiled.Common.Arguments;
 using Wikiled.Common.Reflection;
 
 namespace Wikiled.Arff.Persistence.Headers
@@ -49,7 +48,11 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public int ReadClassIdValue(DataRecord record)
         {
-            Guard.NotNull(() => record, record);
+            if (record == null)
+            {
+                throw new ArgumentNullException(nameof(record));
+            }
+
             return (int)record.Value;
         }
 
