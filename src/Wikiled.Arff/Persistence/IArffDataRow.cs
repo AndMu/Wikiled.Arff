@@ -5,6 +5,8 @@ namespace Wikiled.Arff.Persistence
 {
     public interface IArffDataRow
     {
+        string Key { get; set; }
+
         IArffDataSet Owner { get; }
 
         int Count { get; }

@@ -22,6 +22,8 @@ namespace Wikiled.Arff.Persistence
             }
         }
 
+        public string Key { get; set; }
+
         public IArffDataSet Owner { get; }
 
         public int Count => records.Count;
