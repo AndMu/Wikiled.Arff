@@ -18,8 +18,6 @@ namespace Wikiled.Arff.Persistence
 
         private readonly ConcurrentDictionary<int, IArffDataRow> documents = new ConcurrentDictionary<int, IArffDataRow>();
 
-        private readonly string name;
-
         private int internalDocumentsOffset = 100000;
 
         private bool useTotal;
@@ -32,8 +30,9 @@ namespace Wikiled.Arff.Persistence
             Header = header ?? throw new ArgumentNullException(nameof(header));
             Header.Removed += HeaderWordsRemoved;
             Header.Added += HeaderWordsOnAdded;
-            this.name = string.IsNullOrEmpty(name) ? "DATA" : name;
+            Name = string.IsNullOrEmpty(name) ? "DATA" : name;
         }
+        public string Name { get; }
 
         public IEnumerable<IArffDataRow> Documents
         {
@@ -157,7 +156,7 @@ namespace Wikiled.Arff.Persistence
         public override string ToString()
         {
             var builder = new StringBuilder();
-            builder.AppendFormat("@RELATION {0}\r\n", name);
+            builder.AppendFormat("@RELATION {0}\r\n", Name);
             foreach (var item in Header)
             {
                 builder.AppendFormat("{0}{1}", item, Environment.NewLine);

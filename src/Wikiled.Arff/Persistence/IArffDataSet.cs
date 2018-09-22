@@ -6,6 +6,8 @@ namespace Wikiled.Arff.Persistence
 {
     public interface IArffDataSet
     {
+        string Name { get; }
+
         IHeadersWordsHandling Header { get; }
 
         IEnumerable<IArffDataRow> Documents { get; }
