@@ -25,6 +25,8 @@ namespace Wikiled.Arff.Persistence.Headers
 
         IHeader Parse(string line);
 
+        HeadersWordsHandling CopyHeader(bool sorted = false);
+
         IHeader RegisterHeader(IHeader header);
         
         StringHeader RegisterString(string name);

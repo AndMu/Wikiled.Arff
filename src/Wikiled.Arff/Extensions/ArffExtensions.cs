@@ -23,6 +23,11 @@ namespace Wikiled.Arff.Extensions
             return result;
         }
 
+        public static IArffDataSet Sort(this IArffDataSet arff)
+        {
+            return arff.CopyDataSet(arff.Header.CopyHeader(true), arff.Name);
+        }
+        
         public static IArffDataSet CopyDataSet(this IArffDataSet dataSetSource, IHeadersWordsHandling headers, string name)
         {
             if (dataSetSource == null)

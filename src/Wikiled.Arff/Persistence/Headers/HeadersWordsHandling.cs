@@ -66,26 +66,29 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public object Clone()
         {
-            try
-            {
-                syncSlim.EnterReadLock();
-                var header = new HeadersWordsHandling();
-                foreach (var item in headerTable)
-                {
-                    var cloned = (IHeader)item.Value.Clone();
-                    header.AddHeader(cloned);
-                    if (item.Value == Class)
-                    {
-                        header.RegisterClass((IClassHeader)cloned);
-                    }
-                }
+            return CopyHeader();
+        }
 
-                return header;
-            }
-            finally
+        public HeadersWordsHandling CopyHeader(bool sorted = false)
+        {
+            var header = new HeadersWordsHandling();
+            var selected = headerTable.Select(item => item);
+            if (sorted)
             {
-                syncSlim.ExitReadLock();
+                selected = headerTable.OrderBy(item => item.Key);
             }
+
+            foreach (var item in selected)
+            {
+                var cloned = (IHeader)item.Value.Clone();
+                header.AddHeader(cloned);
+                if (item.Value == Class)
+                {
+                    header.RegisterClass((IClassHeader)cloned);
+                }
+            }
+
+            return header;
         }
 
         public IHeader GetByIndex(int index)
