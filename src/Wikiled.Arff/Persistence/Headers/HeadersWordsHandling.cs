@@ -259,14 +259,12 @@ namespace Wikiled.Arff.Persistence.Headers
 
         public IHeader RegisterHeader(IHeader header)
         {
-            var numeric = header as DateHeader;
-            if (numeric != null)
+            if (header is DateHeader numeric)
             {
                 return RegisterDate(numeric.Name, numeric.Format);
             }
 
-            var stringHeader = header as StringHeader;
-            if (stringHeader != null)
+            if (header is StringHeader stringHeader)
             {
                 return RegisterString(stringHeader.Name);
             }
@@ -378,6 +376,7 @@ namespace Wikiled.Arff.Persistence.Headers
         {
             headerTable[header.Name] = header;
             int totalRegistered = Class != null ? 1 : 0;
+            totalRegistered = header is DateHeader ? headers.Count : totalRegistered;
             headers.Insert(headers.Count - totalRegistered, header);
         }
 

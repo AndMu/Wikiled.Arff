@@ -209,17 +209,17 @@ namespace Wikiled.Arff.Tests.Persistence
             item.AddRecord("Test").Value = "Yes";
             item.AddRecord("Comment").Value = "Added new record";
             Assert.AreEqual(7, docsDataHolder.Header.Total);
-            Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", item.ToString());
+            Assert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", item.ToString());
             docsDataHolder.Save(fileName);
             var loaded = ArffDataSet.Load<PositivityType>(fileName);
             Assert.AreEqual(7, loaded.Header.Total);
             Assert.AreEqual(1, loaded.Documents.Count());
-            Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
+            Assert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
 
             loaded = ArffDataSet.LoadSimple(fileName);
             Assert.AreEqual(7, loaded.Header.Total);
             Assert.AreEqual(1, loaded.Documents.Count());
-            Assert.AreEqual("{0 1,3 2012-02-12,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
+            Assert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
         }
 
 
