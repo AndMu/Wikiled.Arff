@@ -6,15 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using CsvHelper;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Wikiled.Arff.Persistence.Headers;
 using Wikiled.Common.Extensions;
+using Wikiled.Common.Logging;
 
 namespace Wikiled.Arff.Persistence
 {
     public class ArffDataSet : IArffDataSet
     {
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger<ArffDataSet> log = ApplicationLogging.LoggerFactory.CreateLogger<ArffDataSet>();
 
         private readonly ConcurrentDictionary<int, IArffDataRow> documents = new ConcurrentDictionary<int, IArffDataRow>();
 
@@ -202,7 +203,7 @@ namespace Wikiled.Arff.Persistence
             }
             else
             {
-                log.Warn("Document not found: {0}", documentId);
+                log.LogWarning("Document not found: {0}", documentId);
             }
         }
 
@@ -317,7 +318,7 @@ namespace Wikiled.Arff.Persistence
                 var itemBlocks = item.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (itemBlocks.Length < 2)
                 {
-                    log.Error("Can't process line: " + line);
+                    log.LogError("Can't process line: " + line);
                     throw new ArgumentOutOfRangeException("Can't process line: " + line);
                 }
 

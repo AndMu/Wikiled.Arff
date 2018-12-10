@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Wikiled.Arff.Persistence;
 using Wikiled.Arff.Persistence.Headers;
+using Wikiled.Common.Logging;
 
 namespace Wikiled.Arff.Extensions
 {
     public static class ArffExtensions
     {
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger log = ApplicationLogging.CreateLogger("ArffExtensions");
 
         public static IArffDataSet CreateDataSet(this IArffDataSet baseDataSet, string name)
         {
@@ -69,7 +70,7 @@ namespace Wikiled.Arff.Extensions
                 throw new ArgumentNullException(nameof(dataSet));
             }
 
-            log.Debug("CompactClass: {0}", minimum);
+            log.LogDebug("CompactClass: {0}", minimum);
             if (!(dataSet.Header.Class is NominalHeader classItem))
             {
                 throw new InvalidOperationException("Class not supported");
@@ -87,7 +88,7 @@ namespace Wikiled.Arff.Extensions
 
         public static void RemoveClass(this IArffDataSet dataSet, string name)
         {
-            log.Debug("RemoveClass: {0}", name);
+            log.LogDebug("RemoveClass: {0}", name);
             if (!(dataSet.Header.Class is NominalHeader classItem))
             {
                 throw new InvalidOperationException("Class not supported");
@@ -122,7 +123,7 @@ namespace Wikiled.Arff.Extensions
                 throw new ArgumentNullException(nameof(dataSet));
             }
 
-            log.Debug("CompactHeader: {0}", minOccurences);
+            log.LogDebug("CompactHeader: {0}", minOccurences);
             List<Task> tasks = new List<Task>();
             foreach (var header in dataSet.Header.ToArray())
             {
@@ -148,7 +149,7 @@ namespace Wikiled.Arff.Extensions
                 throw new ArgumentNullException(nameof(dataSet));
             }
 
-            log.Debug("CompactReviews: {0}", minReviewSize);
+            log.LogDebug("CompactReviews: {0}", minReviewSize);
             foreach (var review in dataSet.Documents.ToArray())
             {
                 if (review.Count <= minReviewSize)
