@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Wikiled.Arff.Extensions;
-using Wikiled.Arff.Persistence;
+using Wikiled.Arff.Logic;
 
 namespace Wikiled.Arff.Tests.Extensions
 {

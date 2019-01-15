@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Wikiled.Arff.Persistence;
-using Wikiled.Arff.Persistence.Headers;
+using Wikiled.Arff.Logic;
+using Wikiled.Arff.Logic.Headers;
 using Wikiled.Common.Logging;
 
 namespace Wikiled.Arff.Extensions
@@ -42,10 +42,9 @@ namespace Wikiled.Arff.Extensions
             }
 
             var dataSet = ArffDataSet.CreateFixed((IHeadersWordsHandling)headers.Clone(), name);
-            foreach (var review in dataSetSource.Documents.OrderBy(item => item.Key))
+            foreach (var review in dataSetSource.Documents.OrderBy(item => item.Id))
             {
-                var newReview = dataSet.AddDocument();
-                newReview.Key = review.Key;
+                var newReview = dataSet.GetOrCreateDocument(review.Id);
                 foreach (var word in review.GetRecords())
                 {
                     var addedWord = newReview.AddRecord(word.Header);
