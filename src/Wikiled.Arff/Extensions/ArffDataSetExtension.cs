@@ -20,7 +20,9 @@ namespace Wikiled.Arff.Extensions
 
         public static Dictionary<IHeader, int> GetFeatureTable(this IArffDataSet dataSet)
         {
-            var headers = dataSet.Header.Where(item => dataSet.Header.Class != item && !(item is DateHeader)).OrderBy(item => dataSet.Header.GetIndex(item));
+            var headers = dataSet.Header
+                .Where(item => dataSet.Header.Class != item && !(item is DateHeader) && !(item is StringHeader))
+                .OrderBy(item => dataSet.Header.GetIndex(item));
             var table = new Dictionary<IHeader, int>();
             int index = 0;
             foreach (var header in headers)
