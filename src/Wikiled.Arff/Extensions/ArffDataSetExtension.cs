@@ -8,13 +8,13 @@ namespace Wikiled.Arff.Extensions
 {
     public static class ArffDataSetExtension
     {
-        public static IEnumerable<(int? Y, double[] X)> GetData(this IArffDataSet dataSet)
+        public static IEnumerable<(string Id, int? Y, double[] X)> GetData(this IArffDataSet dataSet)
         {
             var table = GetFeatureTable(dataSet);
             foreach (var dataRow in dataSet.Documents)
             {
                 var y = dataSet.Header.Class?.ReadClassIdValue(dataRow.Class);
-                yield return (y, dataRow.GetX(table));
+                yield return (dataRow.Id, y, dataRow.GetX(table));
             }
         }
 
