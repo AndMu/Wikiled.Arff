@@ -84,9 +84,10 @@ namespace Wikiled.Arff.Logic.Headers
             IEnumerable<KeyValuePair<string, IHeader>> selected = headerTable.Select(item => item);
             if (sorted)
             {
-                selected = headerTable.OrderBy(item => item.Key).Where(item => !IsReserved(item.Key));
+                selected = headerTable.OrderBy(item => item.Key);
             }
 
+            selected = selected.Where(item => !IsReserved(item.Key));
             IEnumerable<IHeader> system = headers.Where(item => IsReserved(item.Name));
             foreach (IHeader item in system)
             {

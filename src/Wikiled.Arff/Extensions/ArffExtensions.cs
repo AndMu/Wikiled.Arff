@@ -42,6 +42,8 @@ namespace Wikiled.Arff.Extensions
             }
 
             var dataSet = ArffDataSet.CreateFixed((IHeadersWordsHandling)headers.Clone(), name);
+            dataSet.HasId = dataSetSource.HasId;
+            dataSet.HasDate = dataSet.HasDate;
             foreach (var review in dataSetSource.Documents.OrderBy(item => item.Id))
             {
                 var newReview = dataSet.GetOrCreateDocument(review.Id);

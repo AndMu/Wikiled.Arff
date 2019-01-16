@@ -64,7 +64,10 @@ namespace Wikiled.Arff.Logic
                         throw new InvalidOperationException("Id field can be only set on empty dataset");
                     }
 
-                    Header.RegisterString(Constants.IdField, true);
+                    if (Header[Constants.IdField] == null)
+                    {
+                        Header.RegisterString(Constants.IdField, true);
+                    }
                 }
                 else
                 {
@@ -91,7 +94,10 @@ namespace Wikiled.Arff.Logic
                         throw new InvalidOperationException("Id field can be only set on empty dataset");
                     }
 
-                    Header.RegisterDate(Constants.DATE, true);
+                    if (Header[Constants.DATE] == null)
+                    {
+                        Header.RegisterDate(Constants.DATE, true);
+                    }
                 }
                 else
                 {
