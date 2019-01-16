@@ -46,7 +46,7 @@ namespace Wikiled.Arff.Tests.Logic
         public void GetSimpleData()
         {
             var dataset = ArffDataSet.CreateSimple("Test");
-            dataset.Header.RegisterDate("Date");
+            dataset.Header.RegisterDate("Date", true);
             dataset.Header.RegisterNumericClass();
             var doc = dataset.AddDocument();
             doc.AddRecord("Test1");

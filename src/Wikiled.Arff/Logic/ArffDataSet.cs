@@ -27,6 +27,8 @@ namespace Wikiled.Arff.Logic
 
         private bool hasId;
 
+        private bool hasDate;
+
         private ArffDataSet(IHeadersWordsHandling header, string name)
         {
             isSparse = true;
@@ -62,7 +64,34 @@ namespace Wikiled.Arff.Logic
                         throw new InvalidOperationException("Id field can be only set on empty dataset");
                     }
 
-                    Header.RegisterString(Constants.IdField);
+                    Header.RegisterString(Constants.IdField, true);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Id field can not be disabled");
+                }
+            }
+        }
+
+        public bool HasDate
+        {
+            get => hasDate;
+            set
+            {
+                if (value == hasDate)
+                {
+                    return;
+                }
+
+                hasDate = value;
+                if (value)
+                {
+                    if (documents.Count > 0)
+                    {
+                        throw new InvalidOperationException("Id field can be only set on empty dataset");
+                    }
+
+                    Header.RegisterDate(Constants.DATE, true);
                 }
                 else
                 {
@@ -263,35 +292,35 @@ namespace Wikiled.Arff.Logic
         public void SaveCsv(string fileName)
         {
             using (var streamWriter = new StreamWriter(fileName, false))
-                using (var csvDataOut = new CsvWriter(streamWriter))
+            using (var csvDataOut = new CsvWriter(streamWriter))
+            {
+                var headers = Header.ToArray();
+                foreach (var header in headers)
                 {
-                    var headers = Header.ToArray();
+                    csvDataOut.WriteField(header.Name);
+                }
+
+                csvDataOut.NextRecord();
+                foreach (var doc in Documents)
+                {
                     foreach (var header in headers)
                     {
-                        csvDataOut.WriteField(header.Name);
+                        string value;
+                        if (doc.Class.Header == header)
+                        {
+                            value = header.ReadValue(doc.Class);
+                        }
+                        else
+                        {
+                            value = doc.HeadersTable.TryGetValue(header, out var record) ? header.ReadValue(record) : null;
+                        }
+
+                        csvDataOut.WriteField(value);
                     }
 
                     csvDataOut.NextRecord();
-                    foreach (var doc in Documents)
-                    {
-                        foreach (var header in headers)
-                        {
-                            string value;
-                            if (doc.Class.Header == header)
-                            {
-                                value = header.ReadValue(doc.Class);
-                            }
-                            else
-                            {
-                                value = doc.HeadersTable.TryGetValue(header, out var record) ? header.ReadValue(record) : null;
-                            }
-
-                            csvDataOut.WriteField(value);
-                        }
-
-                        csvDataOut.NextRecord();
-                    }
                 }
+            }
         }
 
         private static IArffDataSet LoadInternal(StreamReader streamReader, Func<string, IArffDataSet> factory)

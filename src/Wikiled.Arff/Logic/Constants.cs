@@ -2,6 +2,10 @@
 {
     public static class Constants
     {
-        public const string IdField = "DOCUMENT_ID_FIELD";
+        public const string IdField = "ID";
+
+        public const string CLASS = "CLASS";
+
+        public const string DATE = "DATE";
     }
 }

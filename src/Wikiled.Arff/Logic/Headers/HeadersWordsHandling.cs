@@ -20,6 +20,15 @@ namespace Wikiled.Arff.Logic.Headers
 
         private readonly ReaderWriterLockSlim syncSlim = new ReaderWriterLockSlim();
 
+        private static readonly HashSet<string> reserved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        static HeadersWordsHandling()
+        {
+            reserved.Add(Constants.IdField);
+            reserved.Add(Constants.CLASS);
+            reserved.Add(Constants.DATE);
+        }
+
         public HeadersWordsHandling()
         {
             Register = true;
@@ -61,7 +70,7 @@ namespace Wikiled.Arff.Logic.Headers
 
         public static bool IsReserved(string word)
         {
-            return string.Compare(word, "class", StringComparison.OrdinalIgnoreCase) == 0;
+            return reserved.Contains(word);
         }
 
         public object Clone()
@@ -185,12 +194,12 @@ namespace Wikiled.Arff.Logic.Headers
 
                 line = line.Substring(index + 1, lastIndex - index - 1);
                 var childItems = line.Split(',').Select(item => item.Trim()).ToArray();
-                return string.Compare(name, "class", StringComparison.OrdinalIgnoreCase) == 0
+                return string.Compare(name, Constants.CLASS, StringComparison.OrdinalIgnoreCase) == 0
                            ? RegisterNominalClass(childItems)
                            : RegisterNominal(name, childItems);
             }
 
-            if (string.Compare(name, "class", StringComparison.OrdinalIgnoreCase) == 0)
+            if (string.Compare(name, Constants.CLASS, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 return RegisterNumericClass();
             }
@@ -202,7 +211,8 @@ namespace Wikiled.Arff.Logic.Headers
 
             if (DateHeader.CanCreate(items))
             {
-                return RegisterDate(name, items[3]);
+                var isSystem = string.Compare(name, Constants.DATE, StringComparison.OrdinalIgnoreCase) == 0;
+                return RegisterDate(name, isSystem, items[3]);
             }
 
             if (StringHeader.CanCreate(items))
@@ -213,12 +223,12 @@ namespace Wikiled.Arff.Logic.Headers
             throw new ArgumentOutOfRangeException("line", "Can't parse line: " + line);
         }
 
-        public DateHeader RegisterDate(string name, string format = "yyyy-MM-dd")
+        public DateHeader RegisterDate(string name, bool isSystem, string format = "yyyy-MM-dd")
         {
             try
             {
                 syncSlim.EnterWriteLock();
-                return RegisterHeader(name, true, x => new DateHeader(Total, x, format));
+                return RegisterHeader(name, !isSystem, x => new DateHeader(Total, x, format));
             }
             finally
             {
@@ -245,7 +255,7 @@ namespace Wikiled.Arff.Logic.Headers
             {
                 syncSlim.EnterWriteLock();
                 EnumNominalHeader header = RegisterHeader(
-                    "class",
+                    Constants.CLASS,
                     false,
                     x => new EnumNominalHeader(Total, x, typeof(T)));
                 RegisterClass(header);
@@ -261,7 +271,8 @@ namespace Wikiled.Arff.Logic.Headers
         {
             if (header is DateHeader numeric)
             {
-                return RegisterDate(numeric.Name, numeric.Format);
+                var isSystem = string.Compare(numeric.Name, Constants.DATE, StringComparison.OrdinalIgnoreCase) == 0;
+                return RegisterDate(numeric.Name, isSystem, numeric.Format);
             }
 
             if (header is StringHeader stringHeader)
@@ -295,7 +306,7 @@ namespace Wikiled.Arff.Logic.Headers
             try
             {
                 syncSlim.EnterWriteLock();
-                NominalHeader header = RegisterHeader("class", false, x => new NominalHeader(Total, x, nominals));
+                NominalHeader header = RegisterHeader(Constants.CLASS, false, x => new NominalHeader(Total, x, nominals));
                 RegisterClass(header);
                 return header;
             }
@@ -323,7 +334,7 @@ namespace Wikiled.Arff.Logic.Headers
             try
             {
                 syncSlim.EnterWriteLock();
-                NumericHeader header = RegisterHeader("class", false, x => new NumericHeader(Total, x));
+                NumericHeader header = RegisterHeader(Constants.CLASS, false, x => new NumericHeader(Total, x));
                 RegisterClass(header);
                 return header;
             }
@@ -333,12 +344,12 @@ namespace Wikiled.Arff.Logic.Headers
             }
         }
 
-        public StringHeader RegisterString(string name)
+        public StringHeader RegisterString(string name, bool isSystem = false)
         {
             try
             {
                 syncSlim.EnterWriteLock();
-                StringHeader header = RegisterHeader(name, true, x => new StringHeader(Total, x));
+                StringHeader header = RegisterHeader(name, !isSystem, x => new StringHeader(Total, x));
                 return header;
             }
             finally

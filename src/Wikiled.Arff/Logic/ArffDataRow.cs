@@ -12,6 +12,8 @@ namespace Wikiled.Arff.Logic
 
         private readonly ConcurrentDictionary<IHeader, DataRecord> records = new ConcurrentDictionary<IHeader, DataRecord>();
 
+        private DateTime? date;
+
         internal ArffDataRow(string docId, IArffDataSet dataSet)
         {
             Id = docId;
@@ -55,6 +57,17 @@ namespace Wikiled.Arff.Logic
         public IHeader[] Headers => records.Keys.ToArray();
 
         public string Id { get; }
+
+        public DateTime? Date
+        {
+            get => date;
+            set
+            {
+                date = value;
+                var idField = Owner.Header[Constants.DATE];
+                AddRecord(idField).Value = value;
+            }
+        }
 
         public DataRecord this[string word]
         {

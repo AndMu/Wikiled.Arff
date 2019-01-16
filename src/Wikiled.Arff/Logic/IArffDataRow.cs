@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Wikiled.Arff.Logic.Headers;
 
 namespace Wikiled.Arff.Logic
@@ -16,6 +17,8 @@ namespace Wikiled.Arff.Logic
         IDictionary<IHeader, DataRecord> HeadersTable { get; }
 
         string Id { get; }
+
+        DateTime? Date { get; set; }
 
         DataRecord this[string word] { get; }
 

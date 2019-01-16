@@ -29,9 +29,9 @@ namespace Wikiled.Arff.Logic.Headers
 
         IHeader RegisterHeader(IHeader header);
         
-        StringHeader RegisterString(string name);
+        StringHeader RegisterString(string name, bool isSystem = false);
 
-        DateHeader RegisterDate(string name, string format = "yyyy-MM-dd");
+        DateHeader RegisterDate(string name, bool isSystem = false, string format = "yyyy-MM-dd");
 
         NominalHeader RegisterNominal(string name, string[] nominals);
 

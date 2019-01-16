@@ -27,7 +27,7 @@ namespace Wikiled.Arff.Tests.Logic
                             "@ATTRIBUTE b NUMERIC\r\n" +
                             "@ATTRIBUTE c NUMERIC\r\n" +
                             "@ATTRIBUTE class_word NUMERIC\r\n" +
-                            "@ATTRIBUTE class {Negative, Neutral, Positive}\r\n" +
+                            "@ATTRIBUTE CLASS {Negative, Neutral, Positive}\r\n" +
                             "@DATA", header.ToString());
             Assert.AreEqual(5, header.Header.Total);
         }
@@ -44,7 +44,7 @@ namespace Wikiled.Arff.Tests.Logic
             Assert.AreEqual("@RELATION Test\r\n" +
                             "@ATTRIBUTE a NUMERIC\r\n" +
                             "@ATTRIBUTE \"b's\" NUMERIC\r\n" +
-                            "@ATTRIBUTE class {Negative, Neutral, Positive}\r\n" +
+                            "@ATTRIBUTE CLASS {Negative, Neutral, Positive}\r\n" +
                             "@DATA", header.ToString());
             Assert.AreEqual(3, header.Header.Total);
         }
@@ -181,7 +181,7 @@ namespace Wikiled.Arff.Tests.Logic
         public void Class()
         {
             IArffDataSet docsDataHolder = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c" });
-            Assert.AreEqual("class", docsDataHolder.Header.Class.Name);
+            Assert.AreEqual("CLASS", docsDataHolder.Header.Class.Name);
         }
 
         [Test]
@@ -189,7 +189,7 @@ namespace Wikiled.Arff.Tests.Logic
         {
             IArffDataSet docsDataHolder = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c", "class" });
             IArffDataRow item = docsDataHolder.AddDocument();
-            DataRecord header = item.AddRecord("class");
+            DataRecord header = item.AddRecord("CLASS");
             Assert.AreEqual("class_word", header.Header.Name);
         }
 
@@ -302,7 +302,7 @@ namespace Wikiled.Arff.Tests.Logic
                             "@ATTRIBUTE 1 NUMERIC{0}" +
                             "@ATTRIBUTE 2 NUMERIC{0}" +
                             "@ATTRIBUTE 3 NUMERIC{0}" +
-                            "@ATTRIBUTE class {{Negative, Neutral, Positive}}{0}" +
+                            "@ATTRIBUTE CLASS {{Negative, Neutral, Positive}}{0}" +
                             "@DATA", "\r\n"), header.ToString());
         }
 
@@ -312,7 +312,9 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataSet header = ArffDataSet.Create<PositivityType>("Data");
             header.UseTotal = true;
             header.HasId = true;
+            header.HasDate = true;
             IArffDataRow doc = header.GetOrCreateDocument("1");
+            doc.Date = new DateTime(2012, 02, 02);
             doc.AddRecord("1");
             doc.Class.Value = PositivityType.Positive;
             doc = header.GetOrCreateDocument("2");
@@ -320,13 +322,14 @@ namespace Wikiled.Arff.Tests.Logic
             doc.Class.Value = PositivityType.Negative;
             Assert.AreEqual(2, header.TotalDocuments);
             IArffDataRow[] docs = header.Documents.ToArray();
-            Assert.AreEqual("{0 1,1 1,3 Positive}", docs[0].ToString());
-            Assert.AreEqual("{0 2,2 1,3 Negative}", docs[1].ToString());
+            Assert.AreEqual("{0 2012-02-02,1 1,2 1,4 Positive}", docs[0].ToString());
+            Assert.AreEqual("{1 2,3 1,4 Negative}", docs[1].ToString());
             Assert.AreEqual(string.Format("@RELATION Data{0}" +
-                                          "@ATTRIBUTE DOCUMENT_ID_FIELD STRING{0}" +
+                                          "@ATTRIBUTE DATE DATE yyyy-MM-dd{0}" +
+                                          "@ATTRIBUTE ID STRING{0}" +
                                           "@ATTRIBUTE 1 NUMERIC{0}" +
                                           "@ATTRIBUTE 3 NUMERIC{0}" +
-                                          "@ATTRIBUTE class {{Negative, Neutral, Positive}}{0}" +
+                                          "@ATTRIBUTE CLASS {{Negative, Neutral, Positive}}{0}" +
                                           "@DATA", "\r\n"), header.ToString());
         }
     }

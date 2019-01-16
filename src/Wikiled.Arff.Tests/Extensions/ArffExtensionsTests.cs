@@ -24,7 +24,7 @@ namespace Wikiled.Arff.Tests.Extensions
             review.Class.Value = "Three";
             dataSet.RemoveClass("Two");
             Assert.AreEqual(2, dataSet.Documents.Count());
-            Assert.AreEqual("@RELATION Test\r\n@ATTRIBUTE class {One, Three}\r\n@DATA", dataSet.ToString());
+            Assert.AreEqual("@RELATION Test\r\n@ATTRIBUTE CLASS {One, Three}\r\n@DATA", dataSet.ToString());
         }
 
         [Test]

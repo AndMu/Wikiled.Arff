@@ -20,6 +20,8 @@ namespace Wikiled.Arff.Logic
 
         bool HasId { get; set; }
 
+        bool HasDate { get; set; }
+
         void Save(string fileName);
 
         void Save(StreamWriter stream);

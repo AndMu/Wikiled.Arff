@@ -48,14 +48,14 @@ namespace Wikiled.Arff.Tests.Logic.Headers
         public void RegisterNumericClass()
         {
             var value = handler.RegisterNumericClass();
-            Assert.AreEqual("class", value.Name);
+            Assert.AreEqual("CLASS", value.Name);
         }
 
         [Test]
         public void RegisterNominalClass()
         {
             var value = handler.RegisterNominalClass("1", "2");
-            Assert.AreEqual("class", value.Name);
+            Assert.AreEqual("CLASS", value.Name);
             Assert.AreEqual(2, value.Nominals.Length);
         }
 
@@ -94,7 +94,7 @@ namespace Wikiled.Arff.Tests.Logic.Headers
             Assert.AreEqual("Two", lineTwo.Nominals[1]);
 
             line = handler.Parse("@ATTRIBUTE class NUMERIC");
-            Assert.AreEqual("class", line.Name);
+            Assert.AreEqual("CLASS", line.Name);
         }
 
         [Test]
