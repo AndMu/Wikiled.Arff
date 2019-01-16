@@ -81,20 +81,27 @@ namespace Wikiled.Arff.Logic.Headers
         public HeadersWordsHandling CopyHeader(bool sorted = false)
         {
             var header = new HeadersWordsHandling();
-            var selected = headerTable.Select(item => item);
+            IEnumerable<KeyValuePair<string, IHeader>> selected = headerTable.Select(item => item);
             if (sorted)
             {
-                selected = headerTable.OrderBy(item => item.Key);
+                selected = headerTable.OrderBy(item => item.Key).Where(item => !IsReserved(item.Key));
             }
 
-            foreach (var item in selected)
+            IEnumerable<IHeader> system = headers.Where(item => IsReserved(item.Name));
+            foreach (IHeader item in system)
             {
-                var cloned = (IHeader)item.Value.Clone();
+                var cloned = (IHeader)item.Clone();
                 header.AddHeader(cloned);
-                if (item.Value == Class)
+                if (item == Class)
                 {
                     header.RegisterClass((IClassHeader)cloned);
                 }
+            }
+
+            foreach (KeyValuePair<string, IHeader> item in selected)
+            {
+                var cloned = (IHeader)item.Value.Clone();
+                header.AddHeader(cloned);
             }
 
             return header;
@@ -141,7 +148,7 @@ namespace Wikiled.Arff.Logic.Headers
 
         public IHeader Parse(string line)
         {
-            int index = line.IndexOf("@ATTRIBUTE", 0, StringComparison.OrdinalIgnoreCase);
+            var index = line.IndexOf("@ATTRIBUTE", 0, StringComparison.OrdinalIgnoreCase);
             if (index < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(line));
@@ -154,8 +161,10 @@ namespace Wikiled.Arff.Logic.Headers
             if (quote > -1 &&
                 quote != nextQuote)
             {
-                List<string> itemsCollect = new List<string>();
-                itemsCollect.Add("@ATTRIBUTE");
+                var itemsCollect = new List<string>
+                {
+                    "@ATTRIBUTE"
+                };
                 name = line.Substring(quote + 1, nextQuote - quote - 1);
                 itemsCollect.Add(name);
                 var remaining = line.Substring(nextQuote + 1).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -186,7 +195,7 @@ namespace Wikiled.Arff.Logic.Headers
             index = line.IndexOf("{", 0);
             if (index > 0)
             {
-                int lastIndex = line.IndexOf("}", index);
+                var lastIndex = line.IndexOf("}", index);
                 if (index < 0)
                 {
                     throw new ArgumentOutOfRangeException("line", "} not found");
@@ -386,7 +395,7 @@ namespace Wikiled.Arff.Logic.Headers
         private void AddHeader(IHeader header)
         {
             headerTable[header.Name] = header;
-            int totalRegistered = Class != null ? 1 : 0;
+            var totalRegistered = Class != null ? 1 : 0;
             totalRegistered = header is DateHeader ? headers.Count : totalRegistered;
             headers.Insert(headers.Count - totalRegistered, header);
         }

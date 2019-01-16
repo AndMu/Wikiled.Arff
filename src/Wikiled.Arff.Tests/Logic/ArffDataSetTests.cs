@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Wikiled.Arff.Extensions;
 using Wikiled.Arff.Logic;
 using Wikiled.Arff.Logic.Headers;
 
@@ -324,6 +325,7 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow[] docs = header.Documents.ToArray();
             Assert.AreEqual("{0 2012-02-02,1 1,2 1,4 Positive}", docs[0].ToString());
             Assert.AreEqual("{1 2,3 1,4 Negative}", docs[1].ToString());
+            header.Sort();
             Assert.AreEqual(string.Format("@RELATION Data{0}" +
                                           "@ATTRIBUTE DATE DATE yyyy-MM-dd{0}" +
                                           "@ATTRIBUTE ID STRING{0}" +
