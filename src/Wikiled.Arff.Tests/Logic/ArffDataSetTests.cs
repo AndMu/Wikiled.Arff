@@ -336,7 +336,10 @@ namespace Wikiled.Arff.Tests.Logic
                                           "@ATTRIBUTE CLASS {{Negative, Neutral, Positive}}{0}" +
                                           "@DATA", "\r\n"), sorterd.ToString());
 
-            sorterd.Save("Test.arff");
+            var file = Path.Combine(TestContext.CurrentContext.TestDirectory, "Test.arff");
+            sorterd.Save(file);
+            var data = ArffDataSet.Load<PositivityType>(file);
+            data.SaveCsv("Data.csv");
         }
     }
 }

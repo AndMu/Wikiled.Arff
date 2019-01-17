@@ -227,7 +227,8 @@ namespace Wikiled.Arff.Logic.Headers
 
             if (StringHeader.CanCreate(items))
             {
-                return RegisterString(name);
+                var isSystem = string.Compare(name, Constants.IdField, StringComparison.OrdinalIgnoreCase) == 0;
+                return RegisterString(name, isSystem);
             }
 
             throw new ArgumentOutOfRangeException("line", "Can't parse line: " + line);
