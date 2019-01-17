@@ -60,12 +60,25 @@ namespace Wikiled.Arff.Logic
 
         public DateTime? Date
         {
-            get => date;
+            get
+            {
+                var field = Owner.Header[Constants.DATE];
+                if (field == null)
+                {
+                    return null;
+                }
+
+                if (!HeadersTable.TryGetValue(field, out var value))
+                {
+                    return null;
+                }
+
+                return value.Value as DateTime?;
+            }
             set
             {
-                date = value;
-                var idField = Owner.Header[Constants.DATE];
-                AddRecord(idField).Value = value;
+                var field = Owner.Header[Constants.DATE];
+                AddRecord(field).Value = value;
             }
         }
 

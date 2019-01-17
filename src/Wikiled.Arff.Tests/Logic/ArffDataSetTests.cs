@@ -315,7 +315,9 @@ namespace Wikiled.Arff.Tests.Logic
             header.HasId = true;
             header.HasDate = true;
             IArffDataRow doc = header.GetOrCreateDocument("1");
+            Assert.IsNull(doc.Date);
             doc.Date = new DateTime(2012, 02, 02);
+            Assert.AreEqual(new DateTime(2012, 02, 02), doc.Date);
             doc.AddRecord("1");
             doc.Class.Value = PositivityType.Positive;
             doc = header.GetOrCreateDocument("2");
