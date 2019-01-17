@@ -364,6 +364,16 @@ namespace Wikiled.Arff.Logic
                 docHolder.Header.Parse(headerItem);
             }
 
+            if (docHolder.Header[Constants.DATE] != null)
+            {
+                docHolder.HasDate = true;
+            }
+
+            if (docHolder.Header[Constants.IdField] != null)
+            {
+                docHolder.HasId = true;
+            }
+
             while ((line = streamReader.ReadLine()) != null)
             {
                 var currentLine = line;
