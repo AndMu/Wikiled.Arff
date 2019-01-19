@@ -77,6 +77,11 @@ namespace Wikiled.Arff.Logic
             }
             set
             {
+                if (!Owner.HasDate)
+                {
+                    throw new InvalidOperationException("Please enable date on the dataset");
+                }
+
                 var field = Owner.Header[Constants.DATE];
                 AddRecord(field).Value = value;
             }
