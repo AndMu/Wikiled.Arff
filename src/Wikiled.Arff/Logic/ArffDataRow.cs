@@ -12,8 +12,6 @@ namespace Wikiled.Arff.Logic
 
         private readonly ConcurrentDictionary<IHeader, DataRecord> records = new ConcurrentDictionary<IHeader, DataRecord>();
 
-        private DateTime? date;
-
         internal ArffDataRow(string docId, IArffDataSet dataSet)
         {
             Id = docId;
