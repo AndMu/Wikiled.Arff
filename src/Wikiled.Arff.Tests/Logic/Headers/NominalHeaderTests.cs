@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Arff.Logic;
 using Wikiled.Arff.Logic.Headers;
 
@@ -23,19 +24,19 @@ namespace Wikiled.Arff.Tests.Logic.Headers
         [Test]
         public void Test()
         {
-            Assert.AreEqual("Test", header.Name);
-            Assert.AreEqual("@ATTRIBUTE Test {one, two}", header.ToString());
-            Assert.AreEqual(1, header.Index);
+            ClassicAssert.AreEqual("Test", header.Name);
+            ClassicAssert.AreEqual("@ATTRIBUTE Test {one, two}", header.ToString());
+            ClassicAssert.AreEqual(1, header.Index);
         }
 
         [TestCase("one", 0)]
         [TestCase("two", 1)]
         public void ReadClassIdValue(string value, int expected)
         {
-            Assert.Throws<ArgumentNullException>(() => header.ReadClassIdValue(null));
+            ClassicAssert.Throws<ArgumentNullException>(() => header.ReadClassIdValue(null));
             record.Value = value;
             int result = header.ReadClassIdValue(record);
-            Assert.AreEqual(expected, result);
+            ClassicAssert.AreEqual(expected, result);
         }
 
         [TestCase(0, "one")]
@@ -43,22 +44,22 @@ namespace Wikiled.Arff.Tests.Logic.Headers
         public void GetValueByClassId(int value, string expected)
         {
             var result = header.GetValueByClassId(value);
-            Assert.AreEqual(expected, result);
+            ClassicAssert.AreEqual(expected, result);
         }
 
         [Test]
         public void CheckSupport()
         {
             header.CheckSupport("one");
-            Assert.Throws<InvalidDataException>(() => header.CheckSupport("test"));
+            ClassicAssert.Throws<InvalidDataException>(() => header.CheckSupport("test"));
         }
 
         [Test]
         public void Clone()
         {
             var result = header.Clone();
-            Assert.AreNotSame(result, header);
-            Assert.IsInstanceOf<NominalHeader>(result);
+            ClassicAssert.AreNotSame(result, header);
+            ClassicAssert.IsInstanceOf<NominalHeader>(result);
         }
     }
 }
