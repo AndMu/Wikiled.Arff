@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Arff.Extensions;
 using Wikiled.Arff.Logic;
 
@@ -14,9 +15,9 @@ namespace Wikiled.Arff.Tests.Logic
         {
             var dataSet = ArffDataSet.LoadSimple(Path.Combine(TestContext.CurrentContext.TestDirectory, "Data", @"problem.arff"));
             var data = dataSet.GetData().ToArray();
-            Assert.AreEqual(9371, data.Length);
-            Assert.AreEqual(8, data[0].X.Length);
-            Assert.AreEqual(0, data[0].Y);
+            ClassicAssert.AreEqual(9371, data.Length);
+            ClassicAssert.AreEqual(8, data[0].X.Length);
+            ClassicAssert.AreEqual(0, data[0].Y);
         }
 
         [Test]
@@ -24,9 +25,9 @@ namespace Wikiled.Arff.Tests.Logic
         {
             var dataSet = ArffDataSet.LoadSimple(Path.Combine(TestContext.CurrentContext.TestDirectory, "Data", @"Data.arff"));
             var data = dataSet.GetData().ToArray();
-            Assert.AreEqual(7215, data.Length);
-            Assert.AreEqual(456, data[0].X.Length);
-            Assert.AreEqual(2, data[0].Y);
+            ClassicAssert.AreEqual(7215, data.Length);
+            ClassicAssert.AreEqual(456, data[0].X.Length);
+            ClassicAssert.AreEqual(2, data[0].Y);
         }
 
         [Test]
@@ -37,9 +38,9 @@ namespace Wikiled.Arff.Tests.Logic
             doc.AddRecord("Test1");
             doc.AddRecord("Test2");
             var data = dataset.GetData().ToArray();
-            Assert.AreEqual(1, data.Length);
-            Assert.AreEqual(2, data[0].X.Length);
-            Assert.IsNull(data[0].Y);
+            ClassicAssert.AreEqual(1, data.Length);
+            ClassicAssert.AreEqual(2, data[0].X.Length);
+            ClassicAssert.IsNull(data[0].Y);
         }
 
         [Test]
@@ -53,9 +54,9 @@ namespace Wikiled.Arff.Tests.Logic
             doc.AddRecord("Test2");
             doc.Class.Value = 1;
             var data = dataset.GetData().ToArray();
-            Assert.AreEqual(1, data.Length);
-            Assert.AreEqual(2, data[0].X.Length);
-            Assert.AreEqual(1, data[0].Y);
+            ClassicAssert.AreEqual(1, data.Length);
+            ClassicAssert.AreEqual(2, data[0].X.Length);
+            ClassicAssert.AreEqual(1, data[0].Y);
         }
     }
 }

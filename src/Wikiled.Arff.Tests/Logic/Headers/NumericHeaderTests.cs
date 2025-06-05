@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Arff.Logic;
 using Wikiled.Arff.Logic.Headers;
 
@@ -23,19 +24,19 @@ namespace Wikiled.Arff.Tests.Logic.Headers
         [Test]
         public void Test()
         {
-            Assert.AreEqual("Test", header.Name);
-            Assert.AreEqual("@ATTRIBUTE Test NUMERIC", header.ToString());
-            Assert.AreEqual(1, header.Index);
+            ClassicAssert.AreEqual("Test", header.Name);
+            ClassicAssert.AreEqual("@ATTRIBUTE Test NUMERIC", header.ToString());
+            ClassicAssert.AreEqual(1, header.Index);
         }
 
         [TestCase(0)]
         [TestCase(1)]
         public void ReadClassIdValue(int value)
         {
-            Assert.Throws<ArgumentNullException>(() => header.ReadClassIdValue(null));
+            ClassicAssert.Throws<ArgumentNullException>(() => header.ReadClassIdValue(null));
             record.Value = value;
             int result = header.ReadClassIdValue(record);
-            Assert.AreEqual(value, result);
+            ClassicAssert.AreEqual(value, result);
         }
 
         [TestCase(0)]
@@ -43,7 +44,7 @@ namespace Wikiled.Arff.Tests.Logic.Headers
         public void GetValueByClassId(int value)
         {
             var result = header.GetValueByClassId(value);
-            Assert.AreEqual(value, result);
+            ClassicAssert.AreEqual(value, result);
         }
 
         [TestCase(0, true, "")]
@@ -58,7 +59,7 @@ namespace Wikiled.Arff.Tests.Logic.Headers
             record.Value = value;
             header.IsSparse = isSparse;
             var result = header.ReadValue(record);
-            Assert.AreEqual(expected, result);
+            ClassicAssert.AreEqual(expected, result);
         }
 
         [TestCase(0, true, "")]
@@ -76,22 +77,22 @@ namespace Wikiled.Arff.Tests.Logic.Headers
             }
 
             var result = header.ReadValue(record);
-            Assert.AreEqual(expected, result);
+            ClassicAssert.AreEqual(expected, result);
         }
 
         [Test]
         public void CheckSupport()
         {
             header.CheckSupport(1);
-            Assert.Throws<InvalidDataException>(() => header.CheckSupport("test"));
+            ClassicAssert.Throws<InvalidDataException>(() => header.CheckSupport("test"));
         }
 
         [Test]
         public void Clone()
         {
             var result = header.Clone();
-            Assert.AreNotSame(result, header);
-            Assert.IsInstanceOf<NumericHeader>(result);
+            ClassicAssert.AreNotSame(result, header);
+            ClassicAssert.IsInstanceOf<NumericHeader>(result);
         }
     }
 }

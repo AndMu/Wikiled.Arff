@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -298,7 +299,7 @@ namespace Wikiled.Arff.Logic
         public void SaveCsv(string fileName)
         {
             using (var streamWriter = new StreamWriter(fileName, false))
-            using (var csvDataOut = new CsvWriter(streamWriter))
+            using (var csvDataOut = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
             {
                 var headers = Header.ToArray();
                 foreach (var header in headers)

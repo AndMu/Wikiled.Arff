@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Arff.Logic.Headers;
 
 namespace Wikiled.Arff.Tests.Logic.Headers
@@ -18,24 +19,24 @@ namespace Wikiled.Arff.Tests.Logic.Headers
         [Test]
         public void Test()
         {
-            Assert.AreEqual("Test", header.Name);
-            Assert.AreEqual("@ATTRIBUTE Test STRING", header.ToString());
-            Assert.AreEqual(1, header.Index);
+            ClassicAssert.AreEqual("Test", header.Name);
+            ClassicAssert.AreEqual("@ATTRIBUTE Test STRING", header.ToString());
+            ClassicAssert.AreEqual(1, header.Index);
         }
 
          [Test]
         public void CheckSupport()
         {
             header.CheckSupport("Test");
-            Assert.Throws<InvalidDataException>(() => header.CheckSupport(1));
+            ClassicAssert.Throws<InvalidDataException>(() => header.CheckSupport(1));
         }
 
         [Test]
         public void Clone()
         {
             var result = header.Clone();
-            Assert.AreNotSame(result, header);
-            Assert.IsInstanceOf<StringHeader>(result);
+            ClassicAssert.AreNotSame(result, header);
+            ClassicAssert.IsInstanceOf<StringHeader>(result);
         }
     }
 }

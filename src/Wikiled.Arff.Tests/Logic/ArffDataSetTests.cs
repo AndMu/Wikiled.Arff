@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using NUnit.Framework.Legacy;
 using Wikiled.Arff.Extensions;
 using Wikiled.Arff.Logic;
 using Wikiled.Arff.Logic.Headers;
@@ -23,14 +24,14 @@ namespace Wikiled.Arff.Tests.Logic
         public void ReservedWordAdded()
         {
             IArffDataSet header = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c", "class" });
-            Assert.AreEqual("@RELATION Data\r\n" +
+            ClassicAssert.AreEqual("@RELATION Data\r\n" +
                             "@ATTRIBUTE a NUMERIC\r\n" +
                             "@ATTRIBUTE b NUMERIC\r\n" +
                             "@ATTRIBUTE c NUMERIC\r\n" +
                             "@ATTRIBUTE class_word NUMERIC\r\n" +
                             "@ATTRIBUTE CLASS {Negative, Neutral, Positive}\r\n" +
                             "@DATA", header.ToString());
-            Assert.AreEqual(5, header.Header.Total);
+            ClassicAssert.AreEqual(5, header.Header.Total);
         }
 
         [Test]
@@ -42,12 +43,12 @@ namespace Wikiled.Arff.Tests.Logic
             item.AddRecord("a");
             item.AddRecord("b's");
             item.AddRecord("b's");
-            Assert.AreEqual("@RELATION Test\r\n" +
+            ClassicAssert.AreEqual("@RELATION Test\r\n" +
                             "@ATTRIBUTE a NUMERIC\r\n" +
                             "@ATTRIBUTE \"b's\" NUMERIC\r\n" +
                             "@ATTRIBUTE CLASS {Negative, Neutral, Positive}\r\n" +
                             "@DATA", header.ToString());
-            Assert.AreEqual(3, header.Header.Total);
+            ClassicAssert.AreEqual(3, header.Header.Total);
         }
 
         [Test]
@@ -57,7 +58,7 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = data.AddDocument();
             item.AddRecord("a");
             item.AddRecord("a");
-            Assert.AreEqual(1, data.Header.Total);
+            ClassicAssert.AreEqual(1, data.Header.Total);
         }
 
         [Test]
@@ -68,12 +69,12 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = header.AddDocument();
             item.AddRecord("a");
             item.Class.Value = PositivityType.Negative;
-            Assert.AreEqual("{0 1,3 Negative}", item.ToString());
+            ClassicAssert.AreEqual("{0 1,3 Negative}", item.ToString());
             item.AddRecord("a").Value = 0;
             header.UseTotal = false;
-            Assert.AreEqual("{3 Negative}", item.ToString());
+            ClassicAssert.AreEqual("{3 Negative}", item.ToString());
             item.AddRecord("a").Value = 2;
-            Assert.AreEqual("{0 2,3 Negative}", item.ToString());
+            ClassicAssert.AreEqual("{0 2,3 Negative}", item.ToString());
         }
 
         [Test]
@@ -83,9 +84,9 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = header.AddDocument();
             item.AddRecord("a");
             item.Class.Value = PositivityType.Positive;
-            Assert.AreEqual(PositivityType.Positive, item.Class.Value);
+            ClassicAssert.AreEqual(PositivityType.Positive, item.Class.Value);
             item.Class.Value = PositivityType.Negative;
-            Assert.AreEqual(PositivityType.Negative, item.Class.Value);
+            ClassicAssert.AreEqual(PositivityType.Negative, item.Class.Value);
         }
 
         [Test]
@@ -96,8 +97,8 @@ namespace Wikiled.Arff.Tests.Logic
             DataRecord resolve = item.AddRecord(new NumericHeader(0, "a"));
             resolve.Value = 3;
             resolve = item.AddRecord(new NumericHeader(0, "a"));
-            Assert.AreEqual(3, resolve.Value);
-            Assert.AreEqual("{0 3,3 Neutral}", item.ToString());
+            ClassicAssert.AreEqual(3, resolve.Value);
+            ClassicAssert.AreEqual("{0 3,3 Neutral}", item.ToString());
         }
 
         [Test]
@@ -108,12 +109,12 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = docsDataHolder.AddDocument();
             item.AddRecord("a");
             item.Class.Value = PositivityType.Negative;
-            Assert.AreEqual("{0 1,3 Negative}", item.ToString());
+            ClassicAssert.AreEqual("{0 1,3 Negative}", item.ToString());
             docsDataHolder.Header.RegisterNumeric("d");
             DataRecord dWord = item.AddRecord("d");
-            Assert.AreEqual("{0 1,3 1,4 Negative}", item.ToString());
+            ClassicAssert.AreEqual("{0 1,3 1,4 Negative}", item.ToString());
             item.SetRecord(new DataRecord(dWord.Header) { Total = 4, Value = 10 });
-            Assert.AreEqual("{0 1,3 10,4 Negative}", item.ToString());
+            ClassicAssert.AreEqual("{0 1,3 10,4 Negative}", item.ToString());
         }
 
         [Test]
@@ -123,7 +124,7 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = docsDataHolder.AddDocument();
             docsDataHolder.Header.RegisterDate("a");
             DataRecord record = item.AddRecord("a");
-            Assert.Throws<InvalidDataException>(() => record.Value = "test");
+            ClassicAssert.Throws<InvalidDataException>(() => record.Value = "test");
         }
 
         [Test]
@@ -134,7 +135,7 @@ namespace Wikiled.Arff.Tests.Logic
             docsDataHolder.Header.RegisterDate("a");
             DataRecord record = item.AddRecord("a");
             record.Value = new DateTime(2012, 02, 12);
-            Assert.AreEqual("{0 2012-02-12,1 Neutral}", item.ToString());
+            ClassicAssert.AreEqual("{0 2012-02-12,1 Neutral}", item.ToString());
         }
 
         [Test]
@@ -145,7 +146,7 @@ namespace Wikiled.Arff.Tests.Logic
             docsDataHolder.Header.RegisterNominal("a", new[] { "1", "2" });
             DataRecord record = item.AddRecord("a");
             record.Value = "1";
-            Assert.AreEqual("{0 1,1 Neutral}", item.ToString());
+            ClassicAssert.AreEqual("{0 1,1 Neutral}", item.ToString());
         }
 
         [Test]
@@ -155,7 +156,7 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = docsDataHolder.AddDocument();
             docsDataHolder.Header.RegisterString("a");
             DataRecord record = item.AddRecord("a");
-            Assert.Throws<InvalidDataException>(() => record.Value = 1);
+            ClassicAssert.Throws<InvalidDataException>(() => record.Value = 1);
         }
 
         [Test]
@@ -165,7 +166,7 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = docsDataHolder.AddDocument();
             docsDataHolder.Header.RegisterNumeric("a");
             DataRecord record = item.AddRecord("a");
-            Assert.Throws<InvalidDataException>(() => record.Value = "1");
+            ClassicAssert.Throws<InvalidDataException>(() => record.Value = "1");
         }
 
         [Test]
@@ -175,14 +176,14 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = docsDataHolder.AddDocument();
             docsDataHolder.Header.RegisterNominal("a", new[] { "1", "2" });
             DataRecord record = item.AddRecord("a");
-            Assert.Throws<InvalidDataException>(() => record.Value = "3");
+            ClassicAssert.Throws<InvalidDataException>(() => record.Value = "3");
         }
 
         [Test]
         public void Class()
         {
             IArffDataSet docsDataHolder = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c" });
-            Assert.AreEqual("CLASS", docsDataHolder.Header.Class.Name);
+            ClassicAssert.AreEqual("CLASS", docsDataHolder.Header.Class.Name);
         }
 
         [Test]
@@ -191,7 +192,7 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataSet docsDataHolder = ArffDataSet.CreateDataRecord<PositivityType>(new[] { "a", "b", "c", "class" });
             IArffDataRow item = docsDataHolder.AddDocument();
             DataRecord header = item.AddRecord("CLASS");
-            Assert.AreEqual("class_word", header.Header.Name);
+            ClassicAssert.AreEqual("class_word", header.Header.Name);
         }
 
         [Test]
@@ -202,25 +203,25 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = docsDataHolder.AddDocument();
             item.AddRecord("a");
             item.Class.Value = PositivityType.Negative;
-            Assert.AreEqual("{0 1,3 Negative}", item.ToString());
+            ClassicAssert.AreEqual("{0 1,3 Negative}", item.ToString());
             docsDataHolder.Header.RegisterDate("Date");
             docsDataHolder.Header.RegisterNominal("Test", new[] { "Yes", "No" });
             docsDataHolder.Header.RegisterString("Comment");
             item.AddRecord("Date").Value = new DateTime(2012, 02, 12);
             item.AddRecord("Test").Value = "Yes";
             item.AddRecord("Comment").Value = "Added new record";
-            Assert.AreEqual(7, docsDataHolder.Header.Total);
-            Assert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", item.ToString());
+            ClassicAssert.AreEqual(7, docsDataHolder.Header.Total);
+            ClassicAssert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", item.ToString());
             docsDataHolder.Save(fileName);
             IArffDataSet loaded = ArffDataSet.Load<PositivityType>(fileName);
-            Assert.AreEqual(7, loaded.Header.Total);
-            Assert.AreEqual(1, loaded.Documents.Count());
-            Assert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
+            ClassicAssert.AreEqual(7, loaded.Header.Total);
+            ClassicAssert.AreEqual(1, loaded.Documents.Count());
+            ClassicAssert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
 
             loaded = ArffDataSet.LoadSimple(fileName);
-            Assert.AreEqual(7, loaded.Header.Total);
-            Assert.AreEqual(1, loaded.Documents.Count());
-            Assert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
+            ClassicAssert.AreEqual(7, loaded.Header.Total);
+            ClassicAssert.AreEqual(1, loaded.Documents.Count());
+            ClassicAssert.AreEqual("{0 2012-02-12,1 1,4 Yes,5 Added new record,6 Negative}", loaded.Documents.First().ToString());
         }
 
 
@@ -234,9 +235,9 @@ namespace Wikiled.Arff.Tests.Logic
             item.Class.Value = PositivityType.Negative;
             docsDataHolder.Save(fileName);
             IArffDataSet loaded = ArffDataSet.Load<PositivityType>(fileName);
-            Assert.AreEqual(4, loaded.Header.Total);
-            Assert.AreEqual(1, loaded.Documents.Count());
-            Assert.AreEqual("{2 1,3 Negative}", loaded.Documents.First().ToString());
+            ClassicAssert.AreEqual(4, loaded.Header.Total);
+            ClassicAssert.AreEqual(1, loaded.Documents.Count());
+            ClassicAssert.AreEqual("{2 1,3 Negative}", loaded.Documents.First().ToString());
         }
 
         [Test]
@@ -247,14 +248,14 @@ namespace Wikiled.Arff.Tests.Logic
             IArffDataRow item = docsDataHolder.AddDocument();
             item.AddRecord("a");
             item.Class.Value = StarType.Three;
-            Assert.AreEqual("{0 1,3 Three}", item.ToString());
-            Assert.AreEqual(4, docsDataHolder.Header.Total);
+            ClassicAssert.AreEqual("{0 1,3 Three}", item.ToString());
+            ClassicAssert.AreEqual(4, docsDataHolder.Header.Total);
             docsDataHolder.Save(fileName);
             IArffDataSet loaded = ArffDataSet.Load<StarType>(fileName);
-            Assert.AreEqual(4, loaded.Header.Total);
-            Assert.AreEqual(1, loaded.Documents.Count());
-            Assert.AreEqual("{0 1,3 Three}", loaded.Documents.First().ToString());
-            Assert.AreEqual(StarType.Three, loaded.Documents.First().Class.Value);
+            ClassicAssert.AreEqual(4, loaded.Header.Total);
+            ClassicAssert.AreEqual(1, loaded.Documents.Count());
+            ClassicAssert.AreEqual("{0 1,3 Three}", loaded.Documents.First().ToString());
+            ClassicAssert.AreEqual(StarType.Three, loaded.Documents.First().Class.Value);
             docsDataHolder.SaveCsv(Path.Combine(TestContext.CurrentContext.TestDirectory, "Test.csv"));
         }
 
@@ -262,24 +263,24 @@ namespace Wikiled.Arff.Tests.Logic
         public void Create()
         {
             IArffDataSet header = ArffDataSet.CreateDataRecord<StarType>(new[] { "1", "2", "3" });
-            Assert.AreEqual(4, header.Header.Total);
+            ClassicAssert.AreEqual(4, header.Header.Total);
         }
 
         [Test]
         public void Createdoc()
         {
             IArffDataSet header = ArffDataSet.CreateDataRecord<StarType>(new[] { "1", "2", "3" });
-            Assert.AreEqual(0, header.TotalDocuments);
+            ClassicAssert.AreEqual(0, header.TotalDocuments);
             header.GetOrCreateDocument("1");
-            Assert.AreEqual(1, header.TotalDocuments);
+            ClassicAssert.AreEqual(1, header.TotalDocuments);
             header.GetOrCreateDocument("2");
-            Assert.AreEqual(2, header.TotalDocuments);
+            ClassicAssert.AreEqual(2, header.TotalDocuments);
             header.GetOrCreateDocument("2");
-            Assert.AreEqual(2, header.TotalDocuments);
-            Assert.AreEqual(2, header.Documents.Count());
+            ClassicAssert.AreEqual(2, header.TotalDocuments);
+            ClassicAssert.AreEqual(2, header.Documents.Count());
             IArffDataRow document = header.Documents.First();
             document.Class.Value = StarType.Four;
-            Assert.AreEqual(StarType.Four, document.Class.Value);
+            ClassicAssert.AreEqual(StarType.Four, document.Class.Value);
         }
 
         [Test]
@@ -295,11 +296,11 @@ namespace Wikiled.Arff.Tests.Logic
             doc.AddRecord("2");
             doc.AddRecord("3");
             doc.Class.Value = PositivityType.Negative;
-            Assert.AreEqual(2, header.TotalDocuments);
+            ClassicAssert.AreEqual(2, header.TotalDocuments);
             IArffDataRow[] docs = header.Documents.ToArray();
-            Assert.AreEqual("{0 1,1 1,3 Positive}", docs[0].ToString());
-            Assert.AreEqual("{1 1,2 1,3 Negative}", docs[1].ToString());
-            Assert.AreEqual(string.Format("@RELATION Data{0}" +
+            ClassicAssert.AreEqual("{0 1,1 1,3 Positive}", docs[0].ToString());
+            ClassicAssert.AreEqual("{1 1,2 1,3 Negative}", docs[1].ToString());
+            ClassicAssert.AreEqual(string.Format("@RELATION Data{0}" +
                             "@ATTRIBUTE 1 NUMERIC{0}" +
                             "@ATTRIBUTE 2 NUMERIC{0}" +
                             "@ATTRIBUTE 3 NUMERIC{0}" +
@@ -315,20 +316,20 @@ namespace Wikiled.Arff.Tests.Logic
             header.HasId = true;
             header.HasDate = true;
             IArffDataRow doc = header.GetOrCreateDocument("1");
-            Assert.IsNull(doc.Date);
+            ClassicAssert.IsNull(doc.Date);
             doc.Date = new DateTime(2012, 02, 02);
-            Assert.AreEqual(new DateTime(2012, 02, 02), doc.Date);
+            ClassicAssert.AreEqual(new DateTime(2012, 02, 02), doc.Date);
             doc.AddRecord("1");
             doc.Class.Value = PositivityType.Positive;
             doc = header.GetOrCreateDocument("2");
             doc.AddRecord("3");
             doc.Class.Value = PositivityType.Negative;
-            Assert.AreEqual(2, header.TotalDocuments);
+            ClassicAssert.AreEqual(2, header.TotalDocuments);
             IArffDataRow[] docs = header.Documents.ToArray();
-            Assert.AreEqual("{0 2012-02-02,1 1,2 1,4 Positive}", docs[0].ToString());
-            Assert.AreEqual("{1 2,3 1,4 Negative}", docs[1].ToString());
+            ClassicAssert.AreEqual("{0 2012-02-02,1 1,2 1,4 Positive}", docs[0].ToString());
+            ClassicAssert.AreEqual("{1 2,3 1,4 Negative}", docs[1].ToString());
             var sorterd = header.Sort();
-            Assert.AreEqual(string.Format("@RELATION Data{0}" +
+            ClassicAssert.AreEqual(string.Format("@RELATION Data{0}" +
                                           "@ATTRIBUTE DATE DATE yyyy-MM-dd{0}" +
                                           "@ATTRIBUTE ID STRING{0}" +
                                           "@ATTRIBUTE 1 NUMERIC{0}" +
